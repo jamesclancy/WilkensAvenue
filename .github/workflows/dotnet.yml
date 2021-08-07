@@ -22,4 +22,4 @@ jobs:
     - name: Build
       run: dotnet run bundle
     - name: Test
-      run: dotnet run --project .\tests\Server\Server.Tests.fsproj
+      run: dotnet run --project ./tests/Server/Server.Tests.fsproj
