@@ -5,6 +5,8 @@ storage: none
 nuget Fable.Remoting.Giraffe
 nuget Saturn
 nuget Expecto
+nuget Dapper
+nuget Npgsql
 
 nuget Fable.Core
 nuget Fable.Elmish
