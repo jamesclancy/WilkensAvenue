@@ -14,5 +14,3 @@ My goals in the project are to:
 * I would like to learn more about the F#/JS interop, I think this project may give me the opportunity to wrap an existing JS/Typescript library for use with Fable.
 
 I am going to be doing this a little differently from how I did the SafeCardGame but will similarly be starting with the `SAFE` template from the Safe Stack and host on Heroku. 
-
-## Step-1 initial Setup
