@@ -3,14 +3,18 @@
     "scripts": {
         "start": "webpack-dev-server",
         "build": "webpack -p",
-        "test:live": "webpack-dev-server --config webpack.tests.config.js"
+        "test:live": "webpack-dev-server --config webpack.tests.config.js",
+        "pretest": "fable-splitter tests/Client -o nodetests/ --commonjs",
+        "test": "mocha nodetests"
     },
     "devDependencies": {
         "copy-webpack-plugin": "^6.1.0",
         "css-loader": "^5.2.6",
+        "fable-splitter": "^2.2.1",
         "file-loader": "^4.2.0",
         "html-webpack-plugin": "^3.2.0",
         "mini-css-extract-plugin": "^0.10.0",
+        "mocha": "^9.0.3",
         "react": "^16.10.2",
         "react-dom": "^16.10.2",
         "remotedev": "^0.2.9",
@@ -20,5 +24,9 @@
         "webpack": "^4.41.2",
         "webpack-cli": "^3.3.9",
         "webpack-dev-server": "^3.8.2"
+    },
+    "dependencies": {
+        "fable-compiler": "^2.13.0",
+        "fable-compiler-js": "^3.0.0"
     }
 }
