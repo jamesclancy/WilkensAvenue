@@ -24,4 +24,4 @@ jobs:
     - name: Run Server Tests
       run: dotnet run --project ./tests/Server/Server.Tests.fsproj
     - name: Run Headless Client Tests
-      run: npm test
+      run: npm ci && npm test
