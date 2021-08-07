@@ -21,5 +21,7 @@ jobs:
       run: dotnet tool restore
     - name: Build
       run: dotnet run bundle
-    - name: Test
+    - name: Run Server Tests
       run: dotnet run --project ./tests/Server/Server.Tests.fsproj
+    - name: Run Headless Client Tests
+      run: npm test
