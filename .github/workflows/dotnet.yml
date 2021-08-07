@@ -1,4 +1,4 @@
-name: .NET
+name: Build and Run Unit Tests
 
 on:
   push:
@@ -21,7 +21,7 @@ jobs:
       run: dotnet tool restore
     - name: Build
       run: dotnet run bundle
-    - name: Run Server Tests
+    - name: Run Server Side Tests
       run: dotnet run --project ./tests/Server/Server.Tests.fsproj
     - name: Run Headless Client Tests
       run: npm ci && npm test
