@@ -26,6 +26,7 @@
         "webpack-dev-server": "^3.8.2"
     },
     "dependencies": {
+        "fable-compiler": "^2.13.0",
         "fable-compiler-js": "^3.0.0"
     }
 }
