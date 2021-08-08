@@ -2,13 +2,19 @@ module App
 
 open Elmish
 open Elmish.React
+open Elmish.UrlParser
+open Elmish
+open Index
+open Elmish.HMR
 
 #if DEBUG
+
 open Elmish.Debug
-open Elmish.HMR
+
 #endif
 
 Program.mkProgram Index.init Index.update Index.view
+|> Program.toNavigable (parseHash clientRouter) urlUpdate
 #if DEBUG
 |> Program.withConsoleTrace
 #endif

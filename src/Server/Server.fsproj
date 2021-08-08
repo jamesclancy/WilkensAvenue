@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
+    <UserSecretsId>193c0817-9bc3-43e4-8566-a15bddedc46a</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Database\Database.fs" />
