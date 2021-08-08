@@ -2,14 +2,14 @@ module App
 
 open Elmish
 open Elmish.React
-
-#if DEBUG
-open Elmish.Debug
-open Elmish.HMR
+open Elmish.UrlParser
 open Elmish
 open Index
-open Elmish.UrlParser
+open Elmish.HMR
 
+#if DEBUG
+
+open Elmish.Debug
 
 #endif
 
