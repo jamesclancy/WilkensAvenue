@@ -55,10 +55,7 @@ let urlUpdate (result:Option<ClientRoute>) (model : Model) =
 let init (initialRoute:Option<ClientRoute>) : Model * Cmd<Msg> =
     let model = { CurrentRoute = None; CurrentUser = None; PageModel = HomePageModel }
 
-    let cmd =
-        Cmd.OfAsync.perform todosApi.getTodos () GotTodos
-
-    model, cmd
+    urlUpdate initialRoute model
 
 let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
     match msg with
