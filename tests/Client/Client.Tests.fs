@@ -5,6 +5,7 @@ open Fable.Mocha
 open Index
 open Shared
 open Elmish.UrlParser
+open Contracts
 
 let runTestForRouteParse urlSlug (expectedResponse : Option<ClientRoute>) =
     let actual = parse clientRouter urlSlug Map.empty
