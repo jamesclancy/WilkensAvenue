@@ -6,6 +6,16 @@ open Feliz.Bulma
 open Fable.React
 open Fable.React.Props
 open Shared
+open Fulma
+open Fulma.Extensions.Wikiki
+
+
+let loadingScreen =
+    PageLoader.pageLoader [ PageLoader.Color IsLight
+                            PageLoader.IsActive true ] [ span [ Class "title has-text-centered" ]
+                                                                                [ str "Loading..."
+                                                                                  br []
+                                                                                   ] ]
 
 let navBar (dispatch: Msg -> unit) =
     div [ Class "is-relative" ]
@@ -39,13 +49,13 @@ let navBar (dispatch: Msg -> unit) =
             div [ Class "navbar-menu" ]
               [ div [ Class "navbar-end" ]
                   [ a [ Class "navbar-item"
-                        Href "#" ]
+                        Href "#/" ]
                       [ str "Home" ]
                     a [ Class "navbar-item"
-                        Href "#" ]
+                        Href "#/viewlocation/12312" ]
                       [ str "Find" ]
                     a [ Class "navbar-item"
-                        Href "#" ]
+                        Href "#/viewlocation/12312" ]
                       [ str "Browse" ]
                     a [ Class "navbar-item"
                         Href "#" ]

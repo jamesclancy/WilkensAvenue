@@ -35,7 +35,6 @@ let modelWithNewPageModel model pm =  { model with CurrentRoute = None; PageMode
 
 let urlUpdate (result:Option<ClientRoute>) (model : Model) =
   let modelWithNewRoute = (modelWithNewPageModel model)
-  System.Console.Write(result.ToString())
   match result with
     | Some Home -> ( modelWithNewRoute HomePageModel , [] )
     | Some (Find (query, filter, page)) -> ( modelWithNewRoute ((query, filter, page) |> FindPageModel), []  )
@@ -53,9 +52,10 @@ let urlUpdate (result:Option<ClientRoute>) (model : Model) =
       ( modelWithNewRoute NotFound , [] ) // no matching route - 404
 
 let init (initialRoute:Option<ClientRoute>) : Model * Cmd<Msg> =
-    let model = { CurrentRoute = None; CurrentUser = None; PageModel = HomePageModel }
-
-    urlUpdate initialRoute model
+    if initialRoute = None then 
+         { CurrentRoute = None; CurrentUser = None; PageModel = HomePageModel }, Cmd.none
+    else 
+        urlUpdate initialRoute { CurrentRoute = None; CurrentUser = None; PageModel = LoadingScreenPageModel }
 
 let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
     match msg with
@@ -71,6 +71,7 @@ open Fable.React
 let view (model: Model) (dispatch: Msg -> unit) =
     match model.PageModel with
     | HomePageModel ->  homeView dispatch
+    | LoadingScreenPageModel -> SharedComponents.loadingScreen
     | ViewLocationPageModel d -> locationDetailView d dispatch
     | NotFound -> str "404"
     | _ -> str "???"
