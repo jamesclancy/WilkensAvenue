@@ -18,6 +18,7 @@ type PageModel =
   | AboutPageModel
   | NotFound
   | Unauthorized
+  | LoadingScreenPageModel
 
 type Model =
     {
