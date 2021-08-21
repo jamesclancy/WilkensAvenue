@@ -112,24 +112,24 @@ let leftMenu =
                                                                              Bulma.icon [ Bulma.icon.isLeft
                                                                                           prop.children [ Html.i [ prop.className
                                                                                                                        "fas fa-search" ] ] ] ] ] ]
-                  Bulma.panelBlock.div [ Bulma.field.div [ Checkradio.checkbox [ prop.id "mycheck"
+                  Bulma.panelBlock.div [ Bulma.field.div [ Checkradio.checkbox [ prop.id "onlyFree"
                                                                                  color.isDanger ]
-                                                           Html.label [ prop.htmlFor "mycheck"
+                                                           Html.label [ prop.htmlFor "onlyFree"
                                                                         prop.text "Only Free" ] ] ]
-                  Bulma.panelBlock.div [ Bulma.field.div [ Checkradio.checkbox [ prop.id "mycheck"
+                  Bulma.panelBlock.div [ Bulma.field.div [ Checkradio.checkbox [ prop.id "onlyOpenAir"
                                                                                  color.isDanger ]
-                                                           Html.label [ prop.htmlFor "mycheck"
+                                                           Html.label [ prop.htmlFor "onlyOpenAir"
                                                                         prop.text "Only Open Air" ] ] ]
-                  Bulma.panelBlock.div [ Bulma.field.div [ Checkradio.checkbox [ prop.id "mycheck"
+                  Bulma.panelBlock.div [ Bulma.field.div [ Checkradio.checkbox [ prop.id "onlyPrivate"
                                                                                  color.isDanger ]
-                                                           Html.label [ prop.htmlFor "mycheck"
+                                                           Html.label [ prop.htmlFor "onlyPrivate"
                                                                         prop.text "Only Private" ] ] ]
                   Bulma.panelHeading [ prop.text "Distance" ]
                   Bulma.panelBlock.div [ Bulma.control.div [ prop.children [ Bulma.field.div [ Checkradio.checkbox [ prop.id
-                                                                                                                         "mycheck"
+                                                                                                                         "filterToZip"
                                                                                                                      color.isDanger ]
                                                                                                Html.label [ prop.htmlFor
-                                                                                                                "mycheck"
+                                                                                                                "filterToZip"
                                                                                                             prop.text
                                                                                                                 "Filter to zip code" ] ]
                                                                              Bulma.field.div [ Bulma.control.div [ Bulma.input.text [ prop.required
