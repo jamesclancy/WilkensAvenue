@@ -35,10 +35,11 @@ let modelWithNewPageModel model pm =  { model with CurrentRoute = None; PageMode
 
 let urlUpdate (result:Option<ClientRoute>) (model : Model) =
   let modelWithNewRoute = (modelWithNewPageModel model)
+  System.Console.Write(result)
   match result with
     | Some Home -> ( modelWithNewRoute HomePageModel , [] )
     | Some (Find (query, filter, page)) -> ( modelWithNewRoute ((query, filter, page) |> FindPageModel), []  )
-    | Some (Browse id) -> ( modelWithNewRoute HomePageModel , []  )
+    | Some (Browse id) -> ( modelWithNewRoute (BrowsePageModel id) , []  )
     | Some AddLocation  -> ( modelWithNewRoute AddLocationPageModel , [] )
     | Some YourLocations -> ( modelWithNewRoute YourLocationsPageModel , []  )
     | Some Login -> ( modelWithNewRoute LoginPageModel , [] )
@@ -65,6 +66,7 @@ let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
 
 open Pages.Home
 open Pages.LocationDetails
+open Pages.BrowseLocations
 open Fable.React
 
 
@@ -73,5 +75,6 @@ let view (model: Model) (dispatch: Msg -> unit) =
     | HomePageModel ->  homeView dispatch
     | LoadingScreenPageModel -> SharedComponents.loadingScreen
     | ViewLocationPageModel d -> locationDetailView d dispatch
+    | BrowsePageModel d -> browseView dispatch
     | NotFound -> str "404"
     | _ -> str "???"

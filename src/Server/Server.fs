@@ -54,6 +54,12 @@ let exampleLocation =
         In 1982 the viaduct was designated a Historic Civil Engineering Landmark by the American Society of Civil Engineers."""
         DescriptionCitation = Some "https://en.wikipedia.org/wiki/Carrollton_Viaduct"
 
+        NeighborhoodId = "1"
+        Neightborhood = "Pigtown"
+
+        Categories = None
+        Tags = None
+
         Address = Some
                 {
                 Address1= Some "123 Wilkens Ave"
@@ -122,15 +128,9 @@ let exampleLocation =
     }
 
 let todosApi =
-    { getTodos = fun () -> async { return storage.GetTodos() }
-      addTodo =
-          fun todo ->
-              async {
-                  match storage.AddTodo todo with
-                  | Ok () -> return todo
-                  | Error e -> return failwith e
-              }
+    { 
       getLocation = fun id -> async { return exampleLocation }
+      searchLocations = fun req -> async {  return { SearchRequest = req; TotalResults = 0; TotalPages = 0; CurrentPage = 1; Results = None }  }
     }
 
 let webApp : HttpFunc -> HttpContext -> HttpFuncResult  =

@@ -52,16 +52,70 @@ type LocationDetailModel =
         Name: string
         SubTitle: string
 
+        NeighborhoodId: string
+        Neightborhood: string
+
         Summary: Option<string>
         Description: Option<string>
         DescriptionCitation: Option<string>
+        
+        Categories: string list option
+        Tags: string list option
 
         Address: Option<AddressDetailModel>
 
         Images: DetailImageModel list option
     }  
 
+type LocationDistanceFilter =
+    {
+        MaxDistance: decimal
+        OriginZipCode: string
+    }
 
+type LocationSearchRequest =
+    {
+        CurrentPage: int
+        ItemsPerPage: int
+        Query: string
+
+        FilterToFree: bool
+        FilterToOpenAir:bool
+        FilterToPrivate:bool
+
+        NeighborhoodFilter: string list option
+        TagFilterFilter: string list option
+        CategoryFilter: string list option
+        DistanceFilter: LocationDistanceFilter option
+    }
+
+type LocationSummaryViewModel =
+    {
+            Id: string
+            NeighborhoodId: string
+            Neightborhood: string
+            Name: string
+            SubTitle: string
+
+            Summary: Option<string>
+
+            Address: Option<AddressDetailModel>
+
+            ThumbnailUrl: string
+            ThumbnailHeight: int
+            ThumbnailWidth: int
+    }
+
+type LocationSearchResult =
+    {
+        SearchRequest: LocationSearchRequest
+
+        TotalResults: int
+        TotalPages: int
+        CurrentPage: int
+
+        Results: LocationSummaryViewModel list option
+    }
 
 module Todo =
     let isValid (description: string) =
@@ -79,6 +133,5 @@ module Route =
         sprintf "/%s/%s" typeName methodName
 
 type ITodosApi =
-    { getTodos: unit -> Async<Todo list>
-      addTodo: Todo -> Async<Todo>
-      getLocation: string -> Async<LocationDetailModel>}
+    { getLocation: string -> Async<LocationDetailModel>
+      searchLocations: LocationSearchRequest -> Async<LocationSearchResult>}

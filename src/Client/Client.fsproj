@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
@@ -7,6 +7,7 @@
     <ItemGroup>
         <Compile Include="Contracts.fs" />
         <Compile Include="Pages\SharedComponents.fs" />
+        <Compile Include="Pages\BrowseLocations.fs" />
         <Compile Include="Pages\LocationDetails.fs" />
         <Compile Include="Pages\Home.fs" />
         <None Include="index.html" />

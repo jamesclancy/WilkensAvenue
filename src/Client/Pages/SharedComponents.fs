@@ -52,10 +52,10 @@ let navBar (dispatch: Msg -> unit) =
                         Href "#/" ]
                       [ str "Home" ]
                     a [ Class "navbar-item"
-                        Href "#/viewlocation/12312" ]
+                        Href "#/browse/12312" ]
                       [ str "Find" ]
                     a [ Class "navbar-item"
-                        Href "#/viewlocation/12312" ]
+                        Href "#/browse/12312" ]
                       [ str "Browse" ]
                     a [ Class "navbar-item"
                         Href "#" ]
@@ -83,7 +83,7 @@ let modifyTextInParagraphOrYieldNothing cls f optionalText =
 let paragraphOrYieldNothing cls optionalText =
     modifyTextInParagraphOrYieldNothing cls id optionalText
 
-let imageThumbnail image =
+let imageThumbnail (image : DetailImageModel) =
   article [ Class "media" ]
       [ figure [ Class "media-left" ]
           [ p [ Class "image is-128x128" ]
@@ -101,30 +101,29 @@ let imageThumbnail image =
 let buildListOfThumbnails images = images |> List.map imageThumbnail |> Seq.ofList
 
 let leftHalfPageImageRotation (imageList :  DetailImageModel list option) =
-
-  let mainImage src alt = img [ Class "is-hidden-touch image is-fullwidth"
-                                Style [
-                                    Position PositionOptions.Absolute
-                                    Top "0"
-                                    Bottom "0"
-                                    Left "0"
-                                    ObjectFit "cover"
-                                    Height "100%"
-                                    Width "50%" ]
-                                Src src
-                                Alt alt ]
+      let mainImage src alt = img [ Class "is-hidden-touch image is-fullwidth"
+                                    Style [
+                                        Position PositionOptions.Absolute
+                                        Top "0"
+                                        Bottom "0"
+                                        Left "0"
+                                        ObjectFit "cover"
+                                        Height "100%"
+                                        Width "50%" ]
+                                    Src src
+                                    Alt alt ]
     
-  let childImageContainer images =
-    footer  [ Class "is-footer" ]
-        [ div [ Class "pt-5 columns is-multiline" ]
-             [ yield! buildListOfThumbnails images ] ]
+      let childImageContainer images =
+        footer  [ Class "is-footer" ]
+            [ div [ Class "pt-5 columns is-multiline" ]
+                 [ yield! buildListOfThumbnails images ] ]
 
-  seq {
-    match imageList with
-    | None | Some []  ->
-        yield (mainImage "https://via.placeholder.com/3708x2950?text=Image+Not+Available" "")
-    | Some [ x ] ->
-          yield mainImage x.FullSizeUrl x.Name
-    | Some (x :: xs)  ->
-          yield mainImage x.FullSizeUrl x.Name
-   }
+      seq {
+        match imageList with
+        | None | Some []  ->
+            yield (mainImage "https://via.placeholder.com/3708x2950?text=Image+Not+Available" "")
+        | Some [ x ] ->
+              yield mainImage x.FullSizeUrl x.Name
+        | Some (x :: xs)  ->
+              yield mainImage x.FullSizeUrl x.Name
+       }
