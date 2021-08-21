@@ -3,7 +3,6 @@ framework: net5.0
 storage: none
 
 nuget Fable.Remoting.Giraffe
-nuget Fulma.Extensions.Wikiki.PageLoader
 nuget Saturn
 nuget Expecto
 nuget Dapper
@@ -20,6 +19,9 @@ nuget Fable.React
 nuget Fable.Remoting.Client
 nuget Feliz
 nuget Feliz.Bulma
+nuget Feliz.Bulma.TagsInput
+nuget Feliz.Bulma.PageLoader
+nuget Feliz.Bulma.Checkradio
 nuget Fulma
 
 nuget Fake.Core.Target

@@ -1,31 +1,29 @@
 module Contracts
 
 open Shared
-open System 
+open System
 
-type PageModel = 
-    HomePageModel
-  | FindPageModel of string * string * int
-  | BrowsePageModel of string
-  | AddLocationPageModel 
-  | YourLocationsPageModel
-  | LoginPageModel
-  | RegisterPageModel
-  | LogoutPageModel
-  | YourAccountPageModel
-  | EditLocationPageModel of string
-  | ViewLocationPageModel of LocationDetailModel
-  | AboutPageModel
-  | NotFound
-  | Unauthorized
-  | LoadingScreenPageModel
+type PageModel =
+    | HomePageModel
+    | FindPageModel of string * string * int
+    | BrowsePageModel of string
+    | AddLocationPageModel
+    | YourLocationsPageModel
+    | LoginPageModel
+    | RegisterPageModel
+    | LogoutPageModel
+    | YourAccountPageModel
+    | EditLocationPageModel of string
+    | ViewLocationPageModel of LocationDetailModel
+    | AboutPageModel
+    | NotFound
+    | Unauthorized
+    | LoadingScreenPageModel
 
 type Model =
-    {
-       CurrentRoute: Option<string>
-       PageModel: PageModel
-       CurrentUser: Option<string>
-    }
+    { CurrentRoute: Option<string>
+      PageModel: PageModel
+      CurrentUser: Option<string> }
 
 type Msg =
     | GotTodos of Todo list
@@ -35,15 +33,15 @@ type Msg =
     | RecievedLocationDetail of LocationDetailModel
 
 type ClientRoute =
-   | Home
-   | Find of string * string * int
-   | Browse of string
-   | AddLocation 
-   | YourLocations
-   | Login
-   | Register
-   | Logout
-   | YourAccount
-   | EditLocation of string
-   | ViewLocation of string
-   | About
+    | Home
+    | Find of string * string * int
+    | Browse of string
+    | AddLocation
+    | YourLocations
+    | Login
+    | Register
+    | Logout
+    | YourAccount
+    | EditLocation of string
+    | ViewLocation of string
+    | About
