@@ -55,45 +55,43 @@ let locationDetailView model (dispatch: Msg -> unit) =
             }
 
 
-
-    section [ Class "section pt-0 is-relative" ] [
-        yield! (leftHalfPageImageRotation model.Images)
-        (navBar dispatch)
-        div [ Class "container" ] [
-            div [ Class "pt-5 columns is-multiline" ] [
-                div [ Class "column is-12 is-5-desktop ml-auto" ] [
-                    div [ Class "mb-5" ] [
-                        h2 [ Class "mb-5 is-size-1 is-size-3-mobile has-text-weight-bold" ] [
-                            str model.Name
-                        ]
-                        p [ Class "subtitle has-text-grey mb-5" ] [
-                            str model.SubTitle
-                        ]
-                        yield! sectionOrYieldNothing "" "Summary" model.Summary
-                        yield! sectionOrYieldNothing "" "Description" model.Description
-                        yield! addressSection model.Address
-                        yield! displayImages model.Images
-                        yield!
-                            modifyTextInParagraphOrYieldNothing
-                                "has-text-grey mb-5"
-                                (fun x -> "Description from: " + x)
-                                model.DescriptionCitation
-                        div [ Class "buttons" ] [
-                            a [ Class "button is-primary"
-                                Href "https://github.com/jamesclancy/WilkensAvenue" ] [
-                                str "Directions"
-                            ]
-                            a [ Class "button is-primary"
-                                Href "https://github.com/jamesclancy/WilkensAvenue" ] [
-                                str "Upload Images"
-                            ]
-                            a [ Class "button is-primary"
-                                Href "https://github.com/jamesclancy/WilkensAvenue" ] [
-                                str "Submit Update to Description"
-                            ]
-                        ]
-                    ]
-                ]
-            ]
-        ]
-    ]
+    Bulma.section [ prop.classes [ "pt-0"; "is-relative" ]
+                    prop.children [ yield! (leftHalfPageImageRotation model.Images)
+                                    (navBar dispatch)
+                                    div [ Class "container" ] [
+                                        div [ Class "pt-5 columns is-multiline" ] [
+                                            div [ Class "column is-12 is-5-desktop ml-auto" ] [
+                                                div [ Class "mb-5" ] [
+                                                    h2 [ Class "mb-5 is-size-1 is-size-3-mobile has-text-weight-bold" ] [
+                                                        str model.Name
+                                                    ]
+                                                    p [ Class "subtitle has-text-grey mb-5" ] [
+                                                        str model.SubTitle
+                                                    ]
+                                                    yield! sectionOrYieldNothing "" "Summary" model.Summary
+                                                    yield! sectionOrYieldNothing "" "Description" model.Description
+                                                    yield! addressSection model.Address
+                                                    yield! displayImages model.Images
+                                                    yield!
+                                                        modifyTextInParagraphOrYieldNothing
+                                                            "has-text-grey mb-5"
+                                                            (fun x -> "Description from: " + x)
+                                                            model.DescriptionCitation
+                                                    div [ Class "buttons" ] [
+                                                        a [ Class "button is-primary"
+                                                            Href "https://github.com/jamesclancy/WilkensAvenue" ] [
+                                                            str "Directions"
+                                                        ]
+                                                        a [ Class "button is-primary"
+                                                            Href "https://github.com/jamesclancy/WilkensAvenue" ] [
+                                                            str "Upload Images"
+                                                        ]
+                                                        a [ Class "button is-primary"
+                                                            Href "https://github.com/jamesclancy/WilkensAvenue" ] [
+                                                            str "Submit Update to Description"
+                                                        ]
+                                                    ]
+                                                ]
+                                            ]
+                                        ]
+                                    ] ] ]

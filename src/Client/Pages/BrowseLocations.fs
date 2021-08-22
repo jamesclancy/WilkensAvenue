@@ -45,34 +45,32 @@ let renderNeighborhoodInformation (locationSummaryViewModel: LocationSummaryView
           str locationSummaryViewModel.Neighborhood
       ] ]
 
-let locationSummaryCard (locationSummaryViewModel: LocationSummaryViewModel) (dispatch: Msg -> unit) =
-    div [ Class "column is-12-mobile is-6-tablet is-3-desktop" ] [
-        div [ Class "card is-shadowless is-slightly-rounded" ] [
-            div [ Class "card-image" ] [
-                figure [ Class "image" ] [
-                    a [ Href "#/viewlocation/12312" ] [
-                        img [ Src locationSummaryViewModel.ThumbnailUrl
-                              Alt locationSummaryViewModel.Name
-                              Class "is-slightly-rounded" ]
-                    ]
-                ]
-            ]
-            div [ Class "card-content" ] [
-                div [ Class "content" ] [
-                    div [] [
-                        span [ Class "title is-4 is-capitalized" ] [
-                            a [ Href "#/viewlocation/12312"
-                                Class "has-text-black" ] [
-                                str locationSummaryViewModel.Name
-                            ]
-                        ]
-                        yield! (renderNeighborhoodInformation locationSummaryViewModel dispatch)
-                    ]
-                ]
-            ]
-        ]
-    ]
+let locationSummaryCardTitlePart (locationSummaryViewModel: LocationSummaryViewModel) (dispatch: Msg -> unit) =
+    Bulma.mediaContent [ Bulma.title.p [ Bulma.title.is4
+                                         prop.children [ a [ Href "#/viewlocation/12312"
+                                                             Class "has-text-black" ] [
+                                                             str locationSummaryViewModel.Name
+                                                         ] ] ]
+                         Bulma.subtitle.p [ Bulma.title.is6
+                                            prop.children [ yield!
+                                                                (renderNeighborhoodInformation
+                                                                    locationSummaryViewModel
+                                                                    dispatch) ] ] ]
 
+
+
+let locationSummaryCard (locationSummaryViewModel: LocationSummaryViewModel) (dispatch: Msg -> unit) =
+    Bulma.column [ column.is12Mobile
+                   column.is6Tablet
+                   column.is3Desktop
+                   prop.children [ Bulma.card [ Bulma.cardImage [ Bulma.image [ a [ Href "#/viewlocation/12312" ] [
+                                                                                    img [ Src
+                                                                                              locationSummaryViewModel.ThumbnailUrl
+                                                                                          Alt
+                                                                                              locationSummaryViewModel.Name
+                                                                                          Class "is-slightly-rounded" ]
+                                                                                ] ] ]
+                                                Bulma.cardContent [ locationSummaryCardTitlePart locationSummaryViewModel dispatch ] ] ] ]
 
 let generateABunchOfItems =
     [ 1 .. 50 ]
@@ -223,27 +221,26 @@ let browseView (dispatch: Msg -> unit) =
 
     section [ Class "section pt-0 is-relative" ] [
         (navBar dispatch)
-        div [ Class "container" ] [
-            section [ Class "section" ] [
-                div [ Class "columns is-multiline" ] [
-                    div [ Class "column is-12-mobile is-6-tablet is-3-desktop" ] [
-                        leftMenu
-                    ]
-                    div [ Class "column is-12-mobile is-6-tablet is-9-desktop" ] [
-                        div [] [
-                            b [] [
-                                str "150 exciting locations found..."
-                            ]
-                        ]
-                        div [ Class "container" ] [
-                            section [ Class "section" ] [
-                                div [ Class "columns is-multiline" ] [
-                                    yield! renderLocationSummaryCards generateABunchOfItems
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
-            ]
-        ]
+        Bulma.container [ container.isFluid
+                          prop.children [ Bulma.section [ prop.children [ Bulma.columns [ columns.isMultiline
+                                                                                          prop.children [ Bulma.column [ column.is12Mobile
+                                                                                                                         column.is6Tablet
+                                                                                                                         column.is3Desktop
+                                                                                                                         column.is2FullHd
+                                                                                                                         prop.children [ leftMenu ] ]
+                                                                                                          Bulma.column [ column.is12Mobile
+                                                                                                                         column.is6Tablet
+                                                                                                                         column.is9Desktop
+                                                                                                                         column.is10FullHd
+                                                                                                                         prop.children [ div [] [
+                                                                                                                                             b [] [
+                                                                                                                                                 str
+                                                                                                                                                     "150 exciting locations found..."
+                                                                                                                                             ]
+                                                                                                                                         ]
+                                                                                                                                         Bulma.container [ container.isFluid
+                                                                                                                                                           prop.children [ Bulma.section [ prop.children [ Bulma.columns [ columns.isMultiline
+                                                                                                                                                                                                                           prop.children [ yield!
+                                                                                                                                                                                                                                               renderLocationSummaryCards
+                                                                                                                                                                                                                                                   generateABunchOfItems ] ] ] ] ] ] ] ] ] ] ] ] ] ]
     ]
