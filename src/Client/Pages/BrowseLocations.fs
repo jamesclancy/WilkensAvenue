@@ -101,7 +101,7 @@ let generateABunchOfItems =
 
 let buildTagInput placeHolder posibleValues currentValue onChanged =
     TagsInput.input [ tagsInput.placeholder placeHolder
-                      tagsInput.value currentValue
+                      tagsInput.defaultValue currentValue
                       tagsInput.onTagsChanged onChanged
                       tagsInput.allowOnlyAutoCompleteValues true
                       tagsInput.caseSensitive false
