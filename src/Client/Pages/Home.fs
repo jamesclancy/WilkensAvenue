@@ -3,8 +3,6 @@ module Pages.Home
 open Contracts
 open Feliz
 open Feliz.Bulma
-open Fable.React
-open Fable.React.Props
 open SharedComponents
 open System
 open Shared
@@ -36,31 +34,43 @@ let homeView (dispatch: Msg -> unit) =
                  Submitter = "#1 User"
                  SubmitterId = "1" } ]
 
-    section [ Class "section pt-0 is-relative" ] [
-        yield! (leftHalfPageImageRotation homeImageRotation)
-        (navBar dispatch)
-        div [ Class "container" ] [
-            div [ Class "pt-5 columns is-multiline" ] [
-                div [ Class "column is-12 is-5-desktop ml-auto" ] [
-                    div [ Class "mb-5" ] [
-                        h2 [ Class "mb-5 is-size-1 is-size-3-mobile has-text-weight-bold" ] [
-                            str "An investigation into Southwest Baltimore's Industrial heritage."
-                        ]
-                        p [ Class "subtitle has-text-grey mb-5" ] [
-                            str "This was largeley created as a technical demo."
-                        ]
-                        div [ Class "buttons" ] [
-                            a [ Class "button is-primary"
-                                Href "https://github.com/jamesclancy/WilkensAvenue" ] [
-                                str "View on Github"
-                            ]
-                            a [ Class "button is-primary"
-                                Href "https://jamesclancy.github.io/categories/wilkensavenue/" ] [
-                                str "Related Blog Posts"
-                            ]
-                        ]
-                    ]
-                ]
-            ]
-        ]
-    ]
+    let pageContent =
+        [ Bulma.title [ title.is2
+                        prop.className "mb-5"
+                        prop.text "An investigation into Southwest Baltimore's Industrial heritage." ]
+          Bulma.title [ title.is4
+                        prop.className "has-text-grey "
+                        prop.text "This was largely created as a technical demo." ]
+          Html.div [ prop.className "buttons"
+                     prop.children [ Html.br []
+                                     Html.br []
+                                     Html.br []
+                                     Html.br []
+                                     Html.br []
+                                     Html.br []
+                                     Html.br []
+                                     Html.br []
+                                     Html.br []
+                                     Html.br []
+                                     Html.br []
+                                     Html.br []
+                                     Html.br []
+                                     Html.a [ prop.className "button is-primary"
+                                              prop.href "https://github.com/jamesclancy/WilkensAvenue"
+                                              prop.text "View on Github" ]
+                                     Html.a [ prop.className "button is-primary"
+                                              prop.href "https://jamesclancy.github.io/categories/wilkensavenue/"
+                                              prop.text "Related Blog Posts" ]
+                                     Html.br []
+                                     Html.br []
+                                     Html.br []
+                                     Html.br []
+                                     Html.br []
+                                     Html.br []
+                                     Html.br []
+                                     Html.br []
+                                     Html.br []
+                                     Html.br []
+                                     Html.br [] ] ] ]
+
+    halfPageImagePage homeImageRotation pageContent dispatch
