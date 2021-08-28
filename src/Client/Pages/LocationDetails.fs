@@ -3,42 +3,36 @@ module Pages.LocationDetails
 open Contracts
 open Feliz
 open Feliz.Bulma
-open Fable.React
-open Fable.React.Props
 open SharedComponents
 open System
 open Shared
 
 
 
-let locationDetailView model (dispatch: Msg -> unit) =
+let locationDetailView (model: LocationDetailModel) (dispatch: Msg -> unit) =
 
     let addressSection (address: AddressDetailModel option) =
 
-        let tryReturnString optStr =
+        let tryReturnString (optStr: string option) =
             match optStr with
             | None -> Seq.empty
-            | Some s -> seq { yield str s }
+            | Some s -> seq { yield Html.span s }
 
         match address with
         | None -> Seq.empty
         | Some a ->
             seq {
                 yield
-                    section [ Class "section" ] [
-                        h1 [ Class "title" ] [ str "Location" ]
-                        p [] [
-                            yield! tryReturnString a.Address1
-                            yield! tryReturnString a.Address2
-                            yield! tryReturnString a.Address3
-                            yield! tryReturnString a.City
-                            yield! tryReturnString a.State
-                            yield! tryReturnString a.Zipcode
+                    Bulma.section [ Bulma.title "Location"
+                                    Html.p [ prop.children [ yield! tryReturnString a.Address1
+                                                             yield! tryReturnString a.Address2
+                                                             yield! tryReturnString a.Address3
+                                                             yield! tryReturnString a.City
+                                                             yield! tryReturnString a.State
+                                                             yield! tryReturnString a.Zipcode
 
-                            yield str (sprintf "Latitude: %f" a.Latitude)
-                            yield str (sprintf "Longitude: %f" a.Longitude)
-                        ]
-                    ]
+                                                             yield Html.span (sprintf "Latitude: %f" a.Latitude)
+                                                             yield Html.span (sprintf "Longitude: %f" a.Longitude) ] ] ]
             }
 
     let displayImages images =
@@ -47,53 +41,36 @@ let locationDetailView model (dispatch: Msg -> unit) =
         | Some x ->
             seq {
                 yield
-                    section [ Class "section" ] [
-                        yield h1 [ Class "title" ] [ str "Images" ]
-                        yield! buildListOfThumbnails x
-                        yield str "Upload your own photos!"
-                    ]
+                    Bulma.section [ prop.children [ yield Bulma.title "Images"
+                                                    yield! buildListOfThumbnails x
+                                                    yield Html.span "Upload your own photos!" ] ]
             }
 
+    let pageContent (model: LocationDetailModel) =
+        [ Bulma.title [ title.is1
+                        prop.className "mb-5"
+                        prop.text model.Name ]
+          Bulma.title [ title.is2
+                        prop.className "has-text-grey "
+                        prop.text model.SubTitle ]
+          yield! sectionOrYieldNothing "" "Summary" model.Summary
+          yield! sectionOrYieldNothing "" "Description" model.Description
+          yield! addressSection model.Address
+          yield! displayImages model.Images
+          yield!
+              modifyTextInParagraphOrYieldNothing
+                  "has-text-grey mb-5"
+                  (fun x -> "Description from: " + x)
+                  model.DescriptionCitation
+          Html.div [ prop.className "buttons"
+                     prop.children [ Html.a [ prop.className "button is-primary"
+                                              prop.href "https://github.com/jamesclancy/WilkensAvenue"
+                                              prop.text "Find Directions" ]
+                                     Html.a [ prop.className "button is-primary"
+                                              prop.href "https://github.com/jamesclancy/WilkensAvenue"
+                                              prop.text "Upload Images" ]
+                                     Html.a [ prop.className "button is-primary"
+                                              prop.href "https://github.com/jamesclancy/WilkensAvenue"
+                                              prop.text "Submit Update to Description" ] ] ] ]
 
-
-    section [ Class "section pt-0 is-relative" ] [
-        yield! (leftHalfPageImageRotation model.Images)
-        (navBar dispatch)
-        div [ Class "container" ] [
-            div [ Class "pt-5 columns is-multiline" ] [
-                div [ Class "column is-12 is-5-desktop ml-auto" ] [
-                    div [ Class "mb-5" ] [
-                        h2 [ Class "mb-5 is-size-1 is-size-3-mobile has-text-weight-bold" ] [
-                            str model.Name
-                        ]
-                        p [ Class "subtitle has-text-grey mb-5" ] [
-                            str model.SubTitle
-                        ]
-                        yield! sectionOrYieldNothing "" "Summary" model.Summary
-                        yield! sectionOrYieldNothing "" "Description" model.Description
-                        yield! addressSection model.Address
-                        yield! displayImages model.Images
-                        yield!
-                            modifyTextInParagraphOrYieldNothing
-                                "has-text-grey mb-5"
-                                (fun x -> "Description from: " + x)
-                                model.DescriptionCitation
-                        div [ Class "buttons" ] [
-                            a [ Class "button is-primary"
-                                Href "https://github.com/jamesclancy/WilkensAvenue" ] [
-                                str "Directions"
-                            ]
-                            a [ Class "button is-primary"
-                                Href "https://github.com/jamesclancy/WilkensAvenue" ] [
-                                str "Upload Images"
-                            ]
-                            a [ Class "button is-primary"
-                                Href "https://github.com/jamesclancy/WilkensAvenue" ] [
-                                str "Submit Update to Description"
-                            ]
-                        ]
-                    ]
-                ]
-            ]
-        ]
-    ]
+    halfPageImagePage model.Images (pageContent model) dispatch

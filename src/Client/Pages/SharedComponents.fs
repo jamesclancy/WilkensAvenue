@@ -3,10 +3,7 @@ module SharedComponents
 open Contracts
 open Feliz
 open Feliz.Bulma
-open Fable.React
-open Fable.React.Props
 open Shared
-open Fulma
 
 
 let loadingScreen =
@@ -15,104 +12,72 @@ let loadingScreen =
                             prop.children [ PageLoader.title "Loading..." ] ]
 
 let navBar (dispatch: Msg -> unit) =
-    div [ Class "is-relative" ] [
-        nav [ Class "navbar py-4"
-              Style [ BackgroundColor "transparent" ] ] [
-            div [ Class "navbar-brand" ] [
-                a [ Class "navbar-item is-hidden-touch"
-                    Href "#" ] [
-                    h1 [ Class "title is-1 text has-text-primary"
-                         Style [ BackgroundColor "rgba(255, 255, 255, 0.8)"
-                                 Padding "10px"
-                                 BorderRadius "25px" ] ] [
-                        str "Wilkens Avenue"
-                    ]
-                ]
-                a [ Class "navbar-item is-hidden-desktop"
-                    Href "#" ] [
-                    h1 [ Class "title is-1 text has-text-primary"
-                         Style [ BackgroundColor "rgba(255, 255, 255, 0.8)"
-                                 Padding "10px"
-                                 BorderRadius "25px" ] ] [
-                        str "Wilkens Avenue"
-                    ]
-                ]
-                a [ Class "navbar-burger"
-                    Role "button"
-                    HTMLAttr.Custom("aria-label", "menu")
-                    AriaExpanded false ] [
-                    span [ HTMLAttr.Custom("aria-hidden", "true") ] []
-                    span [ HTMLAttr.Custom("aria-hidden", "true") ] []
-                    span [ HTMLAttr.Custom("aria-hidden", "true") ] []
-                ]
-            ]
-            div [ Class "navbar-menu" ] [
-                div [ Class "navbar-end" ] [
-                    a [ Class "navbar-item"; Href "#/" ] [
-                        str "Home"
-                    ]
-                    a [ Class "navbar-item"
-                        Href "#/browse/12312" ] [
-                        str "Find"
-                    ]
-                    a [ Class "navbar-item"
-                        Href "#/browse/12312" ] [
-                        str "Browse"
-                    ]
-                    a [ Class "navbar-item"; Href "#" ] [
-                        str "Login"
-                    ]
-                    a [ Class "navbar-item"; Href "#" ] [
-                        str "Register"
-                    ]
-                ]
-            ]
-        ]
-    ]
+
+    Html.div [ prop.children [ Bulma.navbar [ color.isLight
+                                              navbar.isTransparent
+                                              navbar.hasShadow
+                                              navbar.isTransparent
+                                              prop.style []
+
+                                              prop.children [ Bulma.navbarBrand.div [ Bulma.navbarItem.a [ prop.href
+                                                                                                               "#/"
+                                                                                                           prop.children [ Html.h1 [ prop.text
+                                                                                                                                         "Wilkens Avenue"
+                                                                                                                                     prop.className
+                                                                                                                                         "title is-1 text navBarHeader" ] ] ] ]
+                                                              Bulma.navbarMenu [ Bulma.navbarStart.div [ Bulma.navbarItem.a [ prop.text
+                                                                                                                                  "Home"
+                                                                                                                              prop.href
+                                                                                                                                  "#/" ]
+                                                                                                         Bulma.navbarItem.a [ prop.text
+                                                                                                                                  "Find"
+                                                                                                                              prop.href
+                                                                                                                                  "#/browse/12312" ]
+                                                                                                         Bulma.navbarItem.a [ prop.text
+                                                                                                                                  "Browse"
+                                                                                                                              prop.href
+                                                                                                                                  "#/browse/12312" ] ]
+                                                                                 Bulma.navbarEnd.div [ Bulma.navbarItem.div [ Bulma.buttons [ Bulma.button.a [ Html.strong
+                                                                                                                                                                   "Login" ]
+                                                                                                                                              Bulma.button.a [ prop.text
+                                                                                                                                                                   "Register" ] ] ] ] ] ] ] ] ]
 
 
-let sectionOrYieldNothing cls title optionalText =
+
+let sectionOrYieldNothing (cls: string) (title: string) (optionalText: string option) =
     match optionalText with
     | None -> Seq.empty
     | Some x ->
         seq {
             yield
-                section [ Class "section" ] [
-                    h1 [ Class "title" ] [ str title ]
-                    p [ Class cls ] [ str x ]
-                ]
+                Bulma.section [ prop.children [ Bulma.title [ prop.text title ]
+                                                Html.p [ prop.className cls
+                                                         prop.text x ] ] ]
         }
 
 
-let modifyTextInParagraphOrYieldNothing cls f optionalText =
+let modifyTextInParagraphOrYieldNothing (cls: string) (f: string -> string) (optionalText: string option) =
     match optionalText with
     | None -> Seq.empty
-    | Some x -> seq { yield p [ Class cls ] [ str (f x) ] }
+    | Some x ->
+        seq {
+            yield
+                Html.p [ prop.className cls
+                         prop.text (f x) ]
+        }
 
 let paragraphOrYieldNothing cls optionalText =
     modifyTextInParagraphOrYieldNothing cls id optionalText
 
 let imageThumbnail (image: DetailImageModel) =
-    article [ Class "media" ] [
-        figure [ Class "media-left" ] [
-            p [ Class "image is-128x128" ] [
-                img [ Src image.ThumbnailUrl ]
-            ]
-        ]
-        div [ Class "media-content" ] [
-            div [ Class "content" ] [
-                p [] [
-                    strong [] [ str image.Submitter ]
-                    br []
-                    yield! paragraphOrYieldNothing "" image.Description
-                    br []
-                    small [] [
-                        str (image.SubmissionDate.ToString("d"))
-                    ]
-                ]
-            ]
-        ]
-    ]
+    Bulma.media [ Bulma.mediaLeft [ Bulma.image [ Bulma.image.is64x64
+                                                  prop.children [ Html.img [ prop.src image.ThumbnailUrl ] ] ] ]
+                  Bulma.mediaContent [ Bulma.content [ Html.p [ Html.strong image.Submitter
+                                                                Html.br []
+                                                                yield! paragraphOrYieldNothing "" image.Description
+                                                                Html.br []
+                                                                Html.small (image.SubmissionDate.ToString("d")) ] ] ] ]
+
 
 
 let buildListOfThumbnails images =
@@ -120,23 +85,9 @@ let buildListOfThumbnails images =
 
 let leftHalfPageImageRotation (imageList: DetailImageModel list option) =
     let mainImage src alt =
-        img [ Class "is-hidden-touch image is-fullwidth"
-              Style [ Position PositionOptions.Absolute
-                      Top "0"
-                      Bottom "0"
-                      Left "0"
-                      ObjectFit "cover"
-                      Height "100%"
-                      Width "50%" ]
-              Src src
-              Alt alt ]
-
-    let childImageContainer images =
-        footer [ Class "is-footer" ] [
-            div [ Class "pt-5 columns is-multiline" ] [
-                yield! buildListOfThumbnails images
-            ]
-        ]
+        Html.img [ prop.className "is-hidden-touch image halfScreenImage"
+                   prop.src src
+                   prop.alt alt ]
 
     seq {
         match imageList with
@@ -145,3 +96,19 @@ let leftHalfPageImageRotation (imageList: DetailImageModel list option) =
         | Some [ x ] -> yield mainImage x.FullSizeUrl x.Name
         | Some (x :: xs) -> yield mainImage x.FullSizeUrl x.Name
     }
+
+let leftHalfPageImageRotationRightContent innerContent =
+    Bulma.container [ container.isFluid
+                      prop.children [ Bulma.columns [ prop.className "pt-5"
+                                                      columns.isMultiline
+                                                      columns.isGapless
+                                                      prop.children [ Bulma.column [ column.is12
+                                                                                     column.is5Desktop
+                                                                                     prop.className "ml-auto"
+                                                                                     prop.children [ yield! innerContent ] ] ] ] ] ]
+
+let halfPageImagePage (imageList: DetailImageModel list option) formatedRightHandContent (dispatch: Msg -> unit) =
+    Bulma.section [ prop.classes [ "pt-0"; "is-relative" ]
+                    prop.children [ yield! (leftHalfPageImageRotation imageList)
+                                    (navBar dispatch)
+                                    leftHalfPageImageRotationRightContent formatedRightHandContent ] ]

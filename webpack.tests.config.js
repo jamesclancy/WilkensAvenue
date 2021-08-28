@@ -76,7 +76,10 @@ module.exports = {
         ]),
     resolve: {
         // See https://github.com/fable-compiler/Fable/issues/1490
-        symlinks: false
+        symlinks: false,
+        alias: {
+            react: path.resolve('./node_modules/react')
+          }
     },
     // Configuration for webpack-dev-server
     devServer: {

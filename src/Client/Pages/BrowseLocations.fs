@@ -3,8 +3,6 @@ module Pages.BrowseLocations
 open Contracts
 open Feliz
 open Feliz.Bulma
-open Fable.React
-open Fable.React.Props
 open SharedComponents
 open System
 open Shared
@@ -12,67 +10,64 @@ open Fulma
 
 let addressSection (address: AddressDetailModel option) =
 
-    let tryReturnString optStr =
+    let tryReturnString (optStr: string option) =
         match optStr with
         | None -> Seq.empty
-        | Some s -> seq { yield str s }
+        | Some s -> seq { yield Html.span s }
 
     match address with
     | None -> Seq.empty
     | Some a ->
         seq {
             yield
-                div [] [
-                    b [] [ str "Location" ]
-                    p [ Class "m-t-tiny block" ] [
-                        yield! tryReturnString a.Address1
-                        yield! tryReturnString a.Address2
-                        yield! tryReturnString a.Address3
-                        yield br []
-                        yield! tryReturnString a.City
-                        yield! tryReturnString a.State
-                        yield! tryReturnString a.Zipcode
-                        yield br []
-                        yield str (sprintf "(%f " a.Latitude)
-                        yield str (sprintf ",%f) " a.Longitude)
-                    ]
-                ]
+                Html.div [ prop.children [ Html.b [ prop.content "Location" ]
+                                           Html.p [ prop.classes [ "m-t-tiny"; "block" ]
+                                                    prop.children [ yield! tryReturnString a.Address1
+                                                                    yield! tryReturnString a.Address2
+                                                                    yield! tryReturnString a.Address3
+                                                                    yield Html.br []
+                                                                    yield! tryReturnString a.City
+                                                                    yield! tryReturnString a.State
+                                                                    yield! tryReturnString a.Zipcode
+                                                                    yield Html.br []
+                                                                    yield
+                                                                        Html.span (
+                                                                            sprintf "(%f ,%f" a.Latitude a.Longitude
+                                                                        ) ] ] ] ]
         }
 
 let renderNeighborhoodInformation (locationSummaryViewModel: LocationSummaryViewModel) (dispatch: Msg -> unit) =
-    [ br []
-      div [] [
-          str locationSummaryViewModel.Neighborhood
-      ] ]
+    [ Html.br []
+      Html.div [ prop.text locationSummaryViewModel.Neighborhood ] ]
+
+let locationSummaryCardTitlePart (locationSummaryViewModel: LocationSummaryViewModel) (dispatch: Msg -> unit) =
+    Bulma.mediaContent [ Bulma.title.p [ Bulma.title.is4
+                                         prop.children [ Html.a [ prop.href "#/viewlocation/12312"
+                                                                  prop.className "has-text-black"
+                                                                  prop.text locationSummaryViewModel.Name ] ] ]
+                         Bulma.subtitle.p [ Bulma.title.is6
+                                            prop.children [ yield!
+                                                                (renderNeighborhoodInformation
+                                                                    locationSummaryViewModel
+                                                                    dispatch) ] ] ]
+
+
 
 let locationSummaryCard (locationSummaryViewModel: LocationSummaryViewModel) (dispatch: Msg -> unit) =
-    div [ Class "column is-12-mobile is-6-tablet is-3-desktop" ] [
-        div [ Class "card is-shadowless is-slightly-rounded" ] [
-            div [ Class "card-image" ] [
-                figure [ Class "image" ] [
-                    a [ Href "#/viewlocation/12312" ] [
-                        img [ Src locationSummaryViewModel.ThumbnailUrl
-                              Alt locationSummaryViewModel.Name
-                              Class "is-slightly-rounded" ]
-                    ]
-                ]
-            ]
-            div [ Class "card-content" ] [
-                div [ Class "content" ] [
-                    div [] [
-                        span [ Class "title is-4 is-capitalized" ] [
-                            a [ Href "#/viewlocation/12312"
-                                Class "has-text-black" ] [
-                                str locationSummaryViewModel.Name
-                            ]
-                        ]
-                        yield! (renderNeighborhoodInformation locationSummaryViewModel dispatch)
-                    ]
-                ]
-            ]
-        ]
-    ]
-
+    Bulma.column [ column.is12Mobile
+                   column.is6Tablet
+                   column.is3Desktop
+                   prop.children [ Bulma.card [ Bulma.cardImage [ Bulma.image [ Html.a [ prop.href
+                                                                                             "#/viewlocation/12312"
+                                                                                         prop.children [ Html.img [ prop.src
+                                                                                                                        locationSummaryViewModel.ThumbnailUrl
+                                                                                                                    prop.alt
+                                                                                                                        locationSummaryViewModel.Name
+                                                                                                                    prop.className
+                                                                                                                        "is-slightly-rounded" ] ] ] ] ]
+                                                Bulma.cardContent [ locationSummaryCardTitlePart
+                                                                        locationSummaryViewModel
+                                                                        dispatch ] ] ] ]
 
 let generateABunchOfItems =
     [ 1 .. 50 ]
@@ -103,6 +98,29 @@ let generateABunchOfItems =
                         Zipcode = Some "21223"
                         Longitude = 1M
                         Latitude = 1M } })
+
+let buildTagInput placeHolder posibleValues currentValue onChanged =
+    TagsInput.input [ tagsInput.placeholder placeHolder
+                      tagsInput.defaultValue currentValue
+                      tagsInput.onTagsChanged onChanged
+                      tagsInput.allowOnlyAutoCompleteValues true
+                      tagsInput.caseSensitive false
+                      tagsInput.removeSelectedFromAutoComplete true
+                      tagsInput.tagProperties [ tag.isRounded
+                                                color.isWarning ]
+                      tagsInput.autoTrim true
+                      tagsInput.autoCompleteSource (
+                          (fun text ->
+                              async {
+                                  do! Async.Sleep 10
+
+                                  return
+                                      posibleValues
+                                      |> List.filter (fun x -> x.Contains(text))
+                              })
+                      ) ]
+
+
 
 let leftMenu =
     Bulma.panel [ Bulma.panelHeading [ prop.text "Filter" ]
@@ -142,108 +160,51 @@ let leftMenu =
                                                                                                                                           "Zip Code" ] ] ] ] ] ]
 
                   Bulma.panelHeading [ prop.text "Tags" ]
-                  Bulma.panelBlock.div [ Bulma.control.div [ prop.children [ TagsInput.input [ tagsInput.placeholder
-                                                                                                   "Filter to Tags"
-                                                                                               tagsInput.defaultValue []
-                                                                                               tagsInput.onTagsChanged
-                                                                                                   (fun x ->
-                                                                                                       Fable.Core.JS.console.log (
-                                                                                                           x
-                                                                                                       ))
-                                                                                               tagsInput.allowOnlyAutoCompleteValues
-                                                                                                   true
-                                                                                               tagsInput.caseSensitive
-                                                                                                   false
-                                                                                               tagsInput.removeSelectedFromAutoComplete
-                                                                                                   true
-                                                                                               tagsInput.tagProperties [ tag.isRounded
-                                                                                                                         color.isWarning ]
-                                                                                               tagsInput.autoTrim true
-                                                                                               tagsInput.autoCompleteSource (
-                                                                                                   (fun text ->
-                                                                                                       async {
-                                                                                                           do!
-                                                                                                               Async.Sleep
-                                                                                                                   10
-
-                                                                                                           return
-                                                                                                               [ "Railroad"
-                                                                                                                 "Steel"
-                                                                                                                 "Canning" ]
-                                                                                                               |> List.filter
-                                                                                                                   (fun x ->
-                                                                                                                       x.Contains(
-                                                                                                                           text
-                                                                                                                       ))
-                                                                                                       })
-                                                                                               ) ] ] ] ]
+                  Bulma.panelBlock.div [ Bulma.control.div [ prop.children [ buildTagInput
+                                                                                 "Filter to Tags"
+                                                                                 [ "Railroad"; "Steel"; "Canning" ]
+                                                                                 []
+                                                                                 (fun x ->
+                                                                                     Fable.Core.JS.console.log (x)) ] ] ]
 
                   Bulma.panelHeading [ prop.text "Categories" ]
-                  Bulma.panelBlock.div [ Bulma.control.div [ prop.children [ TagsInput.input [ tagsInput.placeholder
-                                                                                                   "Filter to Categories"
-                                                                                               tagsInput.defaultValue []
-                                                                                               tagsInput.onTagsChanged
-                                                                                                   (fun x ->
-                                                                                                       Fable.Core.JS.console.log (
-                                                                                                           x
-                                                                                                       ))
-                                                                                               tagsInput.allowOnlyAutoCompleteValues
-                                                                                                   true
-                                                                                               tagsInput.caseSensitive
-                                                                                                   false
-                                                                                               tagsInput.removeSelectedFromAutoComplete
-                                                                                                   true
-                                                                                               tagsInput.tagProperties [ tag.isRounded
-                                                                                                                         color.isWarning ]
-                                                                                               tagsInput.autoTrim true
-                                                                                               tagsInput.autoCompleteSource (
-                                                                                                   (fun text ->
-                                                                                                       async {
-                                                                                                           do!
-                                                                                                               Async.Sleep
-                                                                                                                   10
+                  Bulma.panelBlock.div [ Bulma.control.div [ prop.children [ buildTagInput
+                                                                                 "Filter to Categories"
+                                                                                 [ "Railroad"; "Steel"; "Canning" ]
+                                                                                 []
+                                                                                 (fun x ->
+                                                                                     Fable.Core.JS.console.log (x)) ] ] ] ]
 
-                                                                                                           return
-                                                                                                               [ "Railroad"
-                                                                                                                 "Steel"
-                                                                                                                 "Canning" ]
-                                                                                                               |> List.filter
-                                                                                                                   (fun x ->
-                                                                                                                       x.Contains(
-                                                                                                                           text
-                                                                                                                       ))
-                                                                                                       })
-                                                                                               ) ] ] ] ] ]
+
+
+let renderLocationSummaryCards items (dispatch: Msg -> unit) =
+    items
+    |> Seq.map (fun x -> (locationSummaryCard x dispatch))
+
+let displaySearchResults (dispatch: Msg -> unit) =
+    [ Html.div [ prop.children [ Html.b [ prop.text "150 exciting locations found..." ] ] ]
+      Bulma.container [ container.isFluid
+                        prop.children [ Bulma.section [ prop.children [ Bulma.columns [ columns.isMultiline
+                                                                                        prop.children [ yield!
+                                                                                                            renderLocationSummaryCards
+                                                                                                                generateABunchOfItems
+                                                                                                                dispatch ] ] ] ] ] ] ]
 
 let browseView (dispatch: Msg -> unit) =
 
-    let renderLocationSummaryCards items =
-        items
-        |> Seq.map (fun x -> (locationSummaryCard x dispatch))
-
-    section [ Class "section pt-0 is-relative" ] [
-        (navBar dispatch)
-        div [ Class "container" ] [
-            section [ Class "section" ] [
-                div [ Class "columns is-multiline" ] [
-                    div [ Class "column is-12-mobile is-6-tablet is-3-desktop" ] [
-                        leftMenu
-                    ]
-                    div [ Class "column is-12-mobile is-6-tablet is-9-desktop" ] [
-                        div [] [
-                            b [] [
-                                str "150 exciting locations found..."
-                            ]
-                        ]
-                        div [ Class "container" ] [
-                            section [ Class "section" ] [
-                                div [ Class "columns is-multiline" ] [
-                                    yield! renderLocationSummaryCards generateABunchOfItems
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
-            ]
-        ]
-    ]
+    Bulma.section [ prop.classes [ "pt-0"; "is-relative" ]
+                    prop.children [ (navBar dispatch)
+                                    Bulma.container [ container.isFluid
+                                                      prop.children [ Bulma.section [ prop.children [ Bulma.columns [ columns.isMultiline
+                                                                                                                      prop.children [ Bulma.column [ column.is12Mobile
+                                                                                                                                                     column.is6Tablet
+                                                                                                                                                     column.is3Desktop
+                                                                                                                                                     column.is2FullHd
+                                                                                                                                                     prop.children [ leftMenu ] ]
+                                                                                                                                      Bulma.column [ column.is12Mobile
+                                                                                                                                                     column.is6Tablet
+                                                                                                                                                     column.is9Desktop
+                                                                                                                                                     column.is10FullHd
+                                                                                                                                                     prop.children [ yield!
+                                                                                                                                                                         displaySearchResults
+                                                                                                                                                                             dispatch ] ] ] ] ] ] ] ] ] ]
