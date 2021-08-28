@@ -4,8 +4,9 @@
         "start": "webpack-dev-server",
         "build": "webpack -p",
         "test:live": "webpack-dev-server --config webpack.tests.config.js",
-        "pretest": "fable-splitter tests/Client -o nodetests/ --commonjs",
-        "test": "mocha nodetests"
+        "pretest": "fable-splitter tests/Client -o nodetests/",
+        "test": "mocha nodetests",
+        "test-headless": "webpack -p nodetests/"
     },
     "devDependencies": {
         "copy-webpack-plugin": "^6.1.0",

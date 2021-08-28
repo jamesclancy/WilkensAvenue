@@ -5,7 +5,7 @@ open Feliz
 open Feliz.Bulma
 open SharedComponents
 open System
-open Shared
+open Shared.DataTransferFormats
 
 let homeView (dispatch: Msg -> unit) =
     let homeImageRotation =

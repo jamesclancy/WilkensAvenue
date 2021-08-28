@@ -3,7 +3,7 @@ module SharedComponents
 open Contracts
 open Feliz
 open Feliz.Bulma
-open Shared
+open Shared.DataTransferFormats
 
 
 let loadingScreen =

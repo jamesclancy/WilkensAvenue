@@ -5,6 +5,7 @@ open Fable.Remoting.Giraffe
 open Saturn
 
 open Shared
+open Shared.DataTransferFormats
 open System
 open Giraffe
 open FSharp.Control.Tasks
@@ -125,6 +126,38 @@ let exampleLocation =
                    Submitter = "#1 User"
                    SubmitterId = "1" } ] }
 
+
+let generateABunchOfItems =
+    [ 1 .. 50 ]
+    |> Seq.map
+        (fun x ->
+            { Id = "1"
+              Name = "Carrollton Viaduct"
+              SubTitle = "America's oldest railroad bridge"
+
+              Summary =
+                  Some
+                      "The Carrollton Viaduct, located over the Gwynns Falls stream near Carroll Park in southwest Baltimore, Maryland, is the first stone masonry bridge built for railroad use in the United States for the Baltimore and Ohio Railroad, founded 1827, with construction beginning the following year and completed 1829. The bridge is named in honor of Charles Carroll of Carrollton (1737-1832), of Maryland, known for being the last surviving signer of the Declaration of Independence, the only Roman Catholic in the Second Continental Congress (1775-1781), and wealthiest man in the Thirteen Colonies of the time of the American Revolutionary War (1775-1783)."
+              ThumbnailUrl =
+                  "https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Carrollton-viaduct.jpg/220px-Carrollton-viaduct.jpg"
+              ThumbnailHeight = 150
+              ThumbnailWidth = 220
+
+              Neighborhood = "Pigtown"
+              NeighborhoodId = "1"
+
+              Address =
+                  Some
+                      { Address1 = Some "123 Wilkens Ave"
+                        Address2 = None
+                        Address3 = None
+                        City = Some "Baltimore"
+                        State = Some "MD"
+                        Zipcode = Some "21223"
+                        Longitude = 1M
+                        Latitude = 1M } })
+
+
 let todosApi =
     { getLocation = fun id -> async { return exampleLocation }
       searchLocations =
@@ -132,10 +165,10 @@ let todosApi =
               async {
                   return
                       { SearchRequest = req
-                        TotalResults = 0
-                        TotalPages = 0
+                        TotalResults = 50
+                        TotalPages = 1
                         CurrentPage = 1
-                        Results = None }
+                        Results = Some(List.ofSeq generateABunchOfItems) }
               } }
 
 let webApp : HttpFunc -> HttpContext -> HttpFuncResult =

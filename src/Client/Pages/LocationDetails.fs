@@ -6,6 +6,7 @@ open Feliz.Bulma
 open SharedComponents
 open System
 open Shared
+open Shared.DataTransferFormats
 
 
 
