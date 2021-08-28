@@ -5,7 +5,7 @@ open Feliz
 open Feliz.Bulma
 open SharedComponents
 open System
-open Shared
+open Shared.DataTransferFormats
 open Fulma
 
 let addressSection (address: AddressDetailModel option) =
@@ -69,36 +69,6 @@ let locationSummaryCard (locationSummaryViewModel: LocationSummaryViewModel) (di
                                                                         locationSummaryViewModel
                                                                         dispatch ] ] ] ]
 
-let generateABunchOfItems =
-    [ 1 .. 50 ]
-    |> Seq.map
-        (fun x ->
-            { Id = "1"
-              Name = "Carrollton Viaduct"
-              SubTitle = "America's oldest railroad bridge"
-
-              Summary =
-                  Some
-                      "The Carrollton Viaduct, located over the Gwynns Falls stream near Carroll Park in southwest Baltimore, Maryland, is the first stone masonry bridge built for railroad use in the United States for the Baltimore and Ohio Railroad, founded 1827, with construction beginning the following year and completed 1829. The bridge is named in honor of Charles Carroll of Carrollton (1737-1832), of Maryland, known for being the last surviving signer of the Declaration of Independence, the only Roman Catholic in the Second Continental Congress (1775-1781), and wealthiest man in the Thirteen Colonies of the time of the American Revolutionary War (1775-1783)."
-              ThumbnailUrl =
-                  "https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Carrollton-viaduct.jpg/220px-Carrollton-viaduct.jpg"
-              ThumbnailHeight = 150
-              ThumbnailWidth = 220
-
-              Neighborhood = "Pigtown"
-              NeighborhoodId = "1"
-
-              Address =
-                  Some
-                      { Address1 = Some "123 Wilkens Ave"
-                        Address2 = None
-                        Address3 = None
-                        City = Some "Baltimore"
-                        State = Some "MD"
-                        Zipcode = Some "21223"
-                        Longitude = 1M
-                        Latitude = 1M } })
-
 let buildTagInput placeHolder posibleValues currentValue onChanged =
     TagsInput.input [ tagsInput.placeholder placeHolder
                       tagsInput.defaultValue currentValue
@@ -121,8 +91,58 @@ let buildTagInput placeHolder posibleValues currentValue onChanged =
                       ) ]
 
 
+let buildDistanceFiler (browseMenuModel: BrowseFilterModel) (dispatch: BrowsePageFilterChange -> unit) =
+    [ Bulma.panelHeading [ prop.text "Distance" ]
+      Bulma.panelBlock.div [ Bulma.control.div [ prop.children [ Bulma.field.div [ Checkradio.checkbox [ prop.id
+                                                                                                             "filterToZip"
+                                                                                                         color.isDanger
+                                                                                                         prop.isChecked
+                                                                                                             browseMenuModel.FilterToZipCode
+                                                                                                         prop.onChange
+                                                                                                             (fun x ->
+                                                                                                                 dispatch (
+                                                                                                                     { browseMenuModel with
+                                                                                                                           FilterToZipCode =
+                                                                                                                               x }
+                                                                                                                     |> FilterChanged
+                                                                                                                 )) ]
+                                                                                   Html.label [ prop.htmlFor
+                                                                                                    "filterToZip"
+                                                                                                prop.text
+                                                                                                    "Filter to zip code" ] ]
+                                                                 Bulma.field.div [ Bulma.control.div [ Bulma.input.text [ prop.required
+                                                                                                                              true
+                                                                                                                          prop.disabled (
+                                                                                                                              not
+                                                                                                                                  browseMenuModel.FilterToZipCode
+                                                                                                                          )
+                                                                                                                          prop.onChange
+                                                                                                                              (fun x ->
+                                                                                                                                  dispatch (
+                                                                                                                                      { browseMenuModel with
+                                                                                                                                            DistanceToFilterTo = x  }
+                                                                                                                                      |> FilterChanged
+                                                                                                                                  )) 
+                                                                                                                          prop.placeholder
+                                                                                                                              "Miles from" ] ] ]
+                                                                 Bulma.field.div [ Bulma.control.div [ Bulma.input.text [ prop.required
+                                                                                                                              true
+                                                                                                                          prop.disabled (
+                                                                                                                              not
+                                                                                                                                  browseMenuModel.FilterToZipCode
+                                                                                                                          )
+                                                                                                                          prop.onChange
+                                                                                                                              (fun x ->
+                                                                                                                                  dispatch (
+                                                                                                                                      { browseMenuModel with
+                                                                                                                                             ZipCodeToFilterTo = x }
+                                                                                                                                      |> FilterChanged
+                                                                                                                                  )) 
+                                                                                                                          prop.placeholder
+                                                                                                                              "Zip Code" ] ] ] ] ] ] ]
 
-let leftMenu =
+
+let leftMenu (browseMenuModel: BrowseFilterModel) (dispatch: BrowsePageFilterChange -> unit) =
     Bulma.panel [ Bulma.panelHeading [ prop.text "Filter" ]
                   Bulma.panelBlock.div [ Bulma.control.div [ Bulma.control.hasIconsLeft
                                                              prop.children [ Bulma.input.text [ prop.placeholder
@@ -142,23 +162,7 @@ let leftMenu =
                                                                                  color.isDanger ]
                                                            Html.label [ prop.htmlFor "onlyPrivate"
                                                                         prop.text "Only Private" ] ] ]
-                  Bulma.panelHeading [ prop.text "Distance" ]
-                  Bulma.panelBlock.div [ Bulma.control.div [ prop.children [ Bulma.field.div [ Checkradio.checkbox [ prop.id
-                                                                                                                         "filterToZip"
-                                                                                                                     color.isDanger ]
-                                                                                               Html.label [ prop.htmlFor
-                                                                                                                "filterToZip"
-                                                                                                            prop.text
-                                                                                                                "Filter to zip code" ] ]
-                                                                             Bulma.field.div [ Bulma.control.div [ Bulma.input.text [ prop.required
-                                                                                                                                          true
-                                                                                                                                      prop.placeholder
-                                                                                                                                          "Miles from" ] ] ]
-                                                                             Bulma.field.div [ Bulma.control.div [ Bulma.input.text [ prop.required
-                                                                                                                                          true
-                                                                                                                                      prop.placeholder
-                                                                                                                                          "Zip Code" ] ] ] ] ] ]
-
+                  yield! (buildDistanceFiler browseMenuModel dispatch)
                   Bulma.panelHeading [ prop.text "Tags" ]
                   Bulma.panelBlock.div [ Bulma.control.div [ prop.children [ buildTagInput
                                                                                  "Filter to Tags"
@@ -179,18 +183,27 @@ let leftMenu =
 
 let renderLocationSummaryCards items (dispatch: Msg -> unit) =
     items
-    |> Seq.map (fun x -> (locationSummaryCard x dispatch))
+    |> List.map (fun x -> (locationSummaryCard x dispatch))
+    |> Seq.ofList
 
-let displaySearchResults (dispatch: Msg -> unit) =
-    [ Html.div [ prop.children [ Html.b [ prop.text "150 exciting locations found..." ] ] ]
-      Bulma.container [ container.isFluid
-                        prop.children [ Bulma.section [ prop.children [ Bulma.columns [ columns.isMultiline
-                                                                                        prop.children [ yield!
-                                                                                                            renderLocationSummaryCards
-                                                                                                                generateABunchOfItems
-                                                                                                                dispatch ] ] ] ] ] ] ]
+let displaySearchResults (locations: LocationSummaryViewModel list option) (dispatch: Msg -> unit) =
+    match locations with
+    | None
+    | Some [] -> [ Html.div [ prop.children [ Html.b [ prop.text "nothing found" ] ] ] ]
+    | Some items ->
+        [ Html.div [ prop.children [ Html.b [ prop.text "150 exciting locations found..." ] ] ]
+          Bulma.container [ container.isFluid
+                            prop.children [ Bulma.section [ prop.children [ Bulma.columns [ columns.isMultiline
+                                                                                            prop.children (
+                                                                                                renderLocationSummaryCards
+                                                                                                    items
+                                                                                                    dispatch
+                                                                                            ) ] ] ] ] ] ]
 
-let browseView (dispatch: Msg -> unit) =
+let browseView (browseViewModel: BrowsePageModel) (dispatch: Msg -> unit) =
+
+    let menuDispatch menuBrowse =
+        menuBrowse |> BrowsePageFilterChanged |> dispatch
 
     Bulma.section [ prop.classes [ "pt-0"; "is-relative" ]
                     prop.children [ (navBar dispatch)
@@ -200,11 +213,14 @@ let browseView (dispatch: Msg -> unit) =
                                                                                                                                                      column.is6Tablet
                                                                                                                                                      column.is3Desktop
                                                                                                                                                      column.is2FullHd
-                                                                                                                                                     prop.children [ leftMenu ] ]
+                                                                                                                                                     prop.children [ leftMenu
+                                                                                                                                                                         browseViewModel.Filter
+                                                                                                                                                                         menuDispatch ] ]
                                                                                                                                       Bulma.column [ column.is12Mobile
                                                                                                                                                      column.is6Tablet
                                                                                                                                                      column.is9Desktop
                                                                                                                                                      column.is10FullHd
                                                                                                                                                      prop.children [ yield!
                                                                                                                                                                          displaySearchResults
+                                                                                                                                                                             browseViewModel.Results
                                                                                                                                                                              dispatch ] ] ] ] ] ] ] ] ] ]
