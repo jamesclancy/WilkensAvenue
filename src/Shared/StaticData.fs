@@ -2,8 +2,8 @@ module Shared.StaticData
 
 
 let possibleTags = [ "Railroad"; "Steel"; "Canning" ]
-let positibleCategories = [ "Railroad"; "Steel"; "Canning" ]
-let positnleNeighborhoods =
+let possibleCategories = [ "Railroad"; "Steel"; "Canning" ]
+let possibleNeighborhoods =
     [
     "Arlington"
     "Central Park Heights"
