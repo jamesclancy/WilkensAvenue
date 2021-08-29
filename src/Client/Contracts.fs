@@ -18,6 +18,10 @@ type BrowseFilterModel =
       AvailableCategories: string list
       AvailableNeighborhoods: string list
 
+      TotalResults: int
+      TotalPages: int
+      CurrentPage: int
+      ResultsPerPage: int
 
       SelectedTags: string list option
       SelectedCategories: string list option
@@ -26,9 +30,6 @@ type BrowseFilterModel =
 type BrowsePageModel =
     { Filter: BrowseFilterModel
 
-      TotalResults: int
-      TotalPages: int
-      CurrentPage: int
 
       Results: LocationSummaryViewModel list option }
 
@@ -64,9 +65,9 @@ type Msg =
     | SetInput of string
     | AddTodo
     | AddedTodo of Todo
-    | RecievedLocationDetail of LocationDetailModel
+    | ReceivedLocationDetail of LocationDetailModel
     | BrowsePageFilterChanged of BrowsePageFilterChange
-    | ReceievedBrowsePageResult of BrowsePageModel
+    | ReceivedBrowsePageResult of BrowsePageModel
 
 
 type ClientRoute =

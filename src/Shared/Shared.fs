@@ -19,6 +19,6 @@ module Route =
 
     let builderWithoutApiPrefix typeName methodName = sprintf "/%s/%s" typeName methodName
 
-type ITodosApi =
+type ILocationInformationApi =
     { getLocation: string -> Async<LocationDetailModel>
       searchLocations: LocationSearchRequest -> Async<LocationSearchResult> }

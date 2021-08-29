@@ -62,7 +62,7 @@ type LocationDetailModel =
 type LocationDistanceFilter =
     { MaxDistance: decimal
       MilesFromZipCode: decimal
-      OriginZipCode: string}
+      OriginZipCode: string }
 
 type LocationSearchRequest =
     { CurrentPage: int

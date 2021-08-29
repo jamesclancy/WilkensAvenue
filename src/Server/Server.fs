@@ -14,29 +14,6 @@ open Microsoft.AspNetCore.Http
 open Authentication
 open Configuration
 
-type Storage() =
-    let todos = ResizeArray<_>()
-
-    member __.GetTodos() = List.ofSeq todos
-
-    member __.AddTodo(todo: Todo) =
-        if Todo.isValid todo.Description then
-            todos.Add todo
-            Ok()
-        else
-            Error "Invalid todo"
-
-let storage = Storage()
-
-storage.AddTodo(Todo.create "Create new SAFE project")
-|> ignore
-
-storage.AddTodo(Todo.create "Write your app")
-|> ignore
-
-storage.AddTodo(Todo.create "Ship it !!!")
-|> ignore
-
 let exampleLocation =
     { Id = "1"
       Name = "Carrollton Viaduct"
@@ -158,7 +135,7 @@ let generateABunchOfItems =
                         Latitude = 1M } })
 
 
-let todosApi =
+let locationInformationApi =
     { getLocation = fun id -> async { return exampleLocation }
       searchLocations =
           fun req ->
@@ -174,7 +151,7 @@ let todosApi =
 let webApp : HttpFunc -> HttpContext -> HttpFuncResult =
     Remoting.createApi ()
     |> Remoting.withRouteBuilder Route.builderWithoutApiPrefix
-    |> Remoting.fromValue todosApi
+    |> Remoting.fromValue locationInformationApi
     |> Remoting.buildHttpHandler
 
 let buildApi next ctx =
@@ -182,7 +159,7 @@ let buildApi next ctx =
         let handler =
             Remoting.createApi ()
             |> Remoting.withRouteBuilder Route.builderWithoutApiPrefix
-            |> Remoting.fromValue todosApi
+            |> Remoting.fromValue locationInformationApi
             |> Remoting.buildHttpHandler
 
         return! handler next ctx

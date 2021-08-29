@@ -120,9 +120,10 @@ let buildDistanceFiler (browseMenuModel: BrowseFilterModel) (dispatch: BrowsePag
                                                                                                                               (fun x ->
                                                                                                                                   dispatch (
                                                                                                                                       { browseMenuModel with
-                                                                                                                                            DistanceToFilterTo = x  }
+                                                                                                                                            DistanceToFilterTo =
+                                                                                                                                                x }
                                                                                                                                       |> FilterChanged
-                                                                                                                                  )) 
+                                                                                                                                  ))
                                                                                                                           prop.placeholder
                                                                                                                               "Miles from" ] ] ]
                                                                  Bulma.field.div [ Bulma.control.div [ Bulma.input.text [ prop.required
@@ -135,9 +136,10 @@ let buildDistanceFiler (browseMenuModel: BrowseFilterModel) (dispatch: BrowsePag
                                                                                                                               (fun x ->
                                                                                                                                   dispatch (
                                                                                                                                       { browseMenuModel with
-                                                                                                                                             ZipCodeToFilterTo = x }
+                                                                                                                                            ZipCodeToFilterTo =
+                                                                                                                                                x }
                                                                                                                                       |> FilterChanged
-                                                                                                                                  )) 
+                                                                                                                                  ))
                                                                                                                           prop.placeholder
                                                                                                                               "Zip Code" ] ] ] ] ] ] ]
 
