@@ -6,7 +6,9 @@ open Feliz.Bulma
 open SharedComponents
 open System
 open Shared.DataTransferFormats
+open Shared.StaticData
 open Fulma
+
 
 let addressSection (address: AddressDetailModel option) =
 
@@ -84,12 +86,13 @@ let buildTagInput placeHolder posibleValues currentValue onChanged =
                               async {
                                   do! Async.Sleep 10
 
+                                  let lowerCaseText = text.ToString().ToLower()
+
                                   return
                                       posibleValues
-                                      |> List.filter (fun x -> x.Contains(text))
+                                      |> List.filter (fun x -> x.ToString().ToLower().Contains(lowerCaseText))
                               })
                       ) ]
-
 
 let buildDistanceFiler (browseMenuModel: BrowseFilterModel) (dispatch: BrowsePageFilterChange -> unit) =
     [ Bulma.panelHeading [ prop.text "Distance" ]
@@ -153,22 +156,52 @@ let leftMenu (browseMenuModel: BrowseFilterModel) (dispatch: BrowsePageFilterCha
                                                                                           prop.children [ Html.i [ prop.className
                                                                                                                        "fas fa-search" ] ] ] ] ] ]
                   Bulma.panelBlock.div [ Bulma.field.div [ Checkradio.checkbox [ prop.id "onlyFree"
-                                                                                 color.isDanger ]
+                                                                                 color.isDanger
+                                                                                 prop.isChecked
+                                                                                     browseMenuModel.OnlyFree
+                                                                                 prop.onChange
+                                                                                     (fun x ->
+                                                                                         dispatch (
+                                                                                             { browseMenuModel with
+                                                                                                   OnlyFree =
+                                                                                                       x }
+                                                                                             |> FilterChanged
+                                                                                         )) ]
                                                            Html.label [ prop.htmlFor "onlyFree"
                                                                         prop.text "Only Free" ] ] ]
                   Bulma.panelBlock.div [ Bulma.field.div [ Checkradio.checkbox [ prop.id "onlyOpenAir"
-                                                                                 color.isDanger ]
+                                                                                 color.isDanger
+                                                                                 prop.isChecked
+                                                                                     browseMenuModel.OnlyOpenAir
+                                                                                 prop.onChange
+                                                                                     (fun x ->
+                                                                                         dispatch (
+                                                                                             { browseMenuModel with
+                                                                                                   OnlyOpenAir =
+                                                                                                       x }
+                                                                                             |> FilterChanged
+                                                                                         )) ]
                                                            Html.label [ prop.htmlFor "onlyOpenAir"
                                                                         prop.text "Only Open Air" ] ] ]
                   Bulma.panelBlock.div [ Bulma.field.div [ Checkradio.checkbox [ prop.id "onlyPrivate"
-                                                                                 color.isDanger ]
+                                                                                 color.isDanger
+                                                                                 prop.isChecked
+                                                                                     browseMenuModel.OnlyPrivate
+                                                                                 prop.onChange
+                                                                                     (fun x ->
+                                                                                         dispatch (
+                                                                                             { browseMenuModel with
+                                                                                                   OnlyPrivate =
+                                                                                                       x }
+                                                                                             |> FilterChanged
+                                                                                         )) ]
                                                            Html.label [ prop.htmlFor "onlyPrivate"
                                                                         prop.text "Only Private" ] ] ]
                   yield! (buildDistanceFiler browseMenuModel dispatch)
                   Bulma.panelHeading [ prop.text "Tags" ]
                   Bulma.panelBlock.div [ Bulma.control.div [ prop.children [ buildTagInput
                                                                                  "Filter to Tags"
-                                                                                 [ "Railroad"; "Steel"; "Canning" ]
+                                                                                 Shared.StaticData.possibleTags
                                                                                  []
                                                                                  (fun x ->
                                                                                      Fable.Core.JS.console.log (x)) ] ] ]
@@ -176,7 +209,14 @@ let leftMenu (browseMenuModel: BrowseFilterModel) (dispatch: BrowsePageFilterCha
                   Bulma.panelHeading [ prop.text "Categories" ]
                   Bulma.panelBlock.div [ Bulma.control.div [ prop.children [ buildTagInput
                                                                                  "Filter to Categories"
-                                                                                 [ "Railroad"; "Steel"; "Canning" ]
+                                                                                 Shared.StaticData.positibleCategories
+                                                                                 []
+                                                                                 (fun x ->
+                                                                                     Fable.Core.JS.console.log (x)) ] ] ]
+                  Bulma.panelHeading [ prop.text "Neighborhoods" ]
+                  Bulma.panelBlock.div [ Bulma.control.div [ prop.children [ buildTagInput
+                                                                                 "Filter to Categories"
+                                                                                 Shared.StaticData.positnleNeighborhoods
                                                                                  []
                                                                                  (fun x ->
                                                                                      Fable.Core.JS.console.log (x)) ] ] ] ]
