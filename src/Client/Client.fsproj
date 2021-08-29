@@ -6,6 +6,7 @@
     </PropertyGroup>
     <ItemGroup>
         <Compile Include="Contracts.fs" />
+        <Compile Include="ContractMappings.fs" />
         <Compile Include="Pages\SharedComponents.fs" />
         <Compile Include="Pages\BrowseLocations.fs" />
         <Compile Include="Pages\LocationDetails.fs" />

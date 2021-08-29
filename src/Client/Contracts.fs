@@ -61,10 +61,6 @@ type BrowsePageFilterChange =
     | LoadPreviousPage of BrowseFilterModel
 
 type Msg =
-    | GotTodos of Todo list
-    | SetInput of string
-    | AddTodo
-    | AddedTodo of Todo
     | ReceivedLocationDetail of LocationDetailModel
     | BrowsePageFilterChanged of BrowsePageFilterChange
     | ReceivedBrowsePageResult of BrowsePageModel
@@ -83,3 +79,4 @@ type ClientRoute =
     | EditLocation of string
     | ViewLocation of string
     | About
+
