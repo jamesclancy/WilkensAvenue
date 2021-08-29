@@ -9,10 +9,10 @@ open Shared
 open Shared.DataTransferFormats
 
 
-let todosApi =
+let locationInformationApi =
     Remoting.createApi ()
     |> Remoting.withRouteBuilder Route.builder
-    |> Remoting.buildProxy<ITodosApi>
+    |> Remoting.buildProxy<ILocationInformationApi>
 
 let clientRouter : UrlParser.Parser<(ClientRoute -> ClientRoute), ClientRoute> =
     oneOf [
@@ -38,25 +38,33 @@ let modelWithNewPageModel model pm =
           CurrentRoute = None
           PageModel = pm }
 
-let mapLocationSearchRequestToBrowseFilterModel (locationSearchResult: LocationSearchRequest) : BrowseFilterModel =
+let mapLocationSearchRequestToBrowseFilterModel
+    (locationSearchResult: LocationSearchRequest)
+    totalPages
+    totalResults
+    : BrowseFilterModel =
     let searchFilter =
         match locationSearchResult.Query with
         | s when System.String.IsNullOrWhiteSpace(s) -> None
         | s -> Some s
 
-    { SearchFilter = searchFilter
+    { TotalResults = totalResults
+      TotalPages = totalPages
+      CurrentPage = locationSearchResult.CurrentPage
+      SearchFilter = searchFilter
+      ResultsPerPage = locationSearchResult.ItemsPerPage
       OnlyFree = locationSearchResult.FilterToFree
       OnlyOpenAir = locationSearchResult.FilterToOpenAir
       OnlyPrivate = locationSearchResult.FilterToPrivate
       FilterToZipCode = locationSearchResult.DistanceFilter.IsSome
       DistanceToFilterTo =
           locationSearchResult.DistanceFilter
-          |> Option.map (fun x -> x.OriginZipCode) 
-          |> Option.fold (fun x y -> x ) ""
+          |> Option.map (fun x -> x.OriginZipCode)
+          |> Option.fold (fun x y -> x) ""
       ZipCodeToFilterTo =
           locationSearchResult.DistanceFilter
-          |> Option.map (fun x -> x.MaxDistance.ToString()) 
-          |> Option.fold (fun x y -> x ) ""
+          |> Option.map (fun x -> x.MaxDistance.ToString())
+          |> Option.fold (fun x y -> x) ""
 
       AvailableTags = [ "B&O"; "Railroad" ]
       AvailableCategories = [ "Steel"; "Port"; "Colonial" ]
@@ -71,13 +79,9 @@ let mapLocationSearchRequestToBrowseFilterModel (locationSearchResult: LocationS
       SelectedCategories = locationSearchResult.CategoryFilter
       SelectedNeighborhoods = locationSearchResult.NeighborhoodFilter }
 
-let mapBrowseFilterModelToLocationSearchRequest (locationSearchResult:  BrowseFilterModel) : LocationSearchRequest =
+let mapBrowseFilterModelToLocationSearchRequest (locationSearchResult: BrowseFilterModel) : LocationSearchRequest =
 
-    let optionFromString s = match s with
-    | s when System.String.IsNullOrWhiteSpace(s) -> None
-    | s -> Some s
-
-    let decimalFromString (s : string) =
+    let decimalFromString (s: string) =
         match System.Decimal.TryParse s with
         | (true, value) -> value
         | (_, _) -> 15.0m
@@ -87,40 +91,42 @@ let mapBrowseFilterModelToLocationSearchRequest (locationSearchResult:  BrowseFi
         | None -> ""
         | Some s -> s
 
-    let filterToDistance : LocationDistanceFilter option = match locationSearchResult.FilterToZipCode with
-        | true -> Some { MaxDistance = decimalFromString locationSearchResult.DistanceToFilterTo
-                         OriginZipCode = locationSearchResult.ZipCodeToFilterTo
-                         MilesFromZipCode = 0m}
+    let filterToDistance : LocationDistanceFilter option =
+        match locationSearchResult.FilterToZipCode with
+        | true ->
+            Some
+                { MaxDistance = decimalFromString locationSearchResult.DistanceToFilterTo
+                  OriginZipCode = locationSearchResult.ZipCodeToFilterTo
+                  MilesFromZipCode = 0m }
         | false -> None
 
 
     { Query = searchFilter
       FilterToFree = locationSearchResult.OnlyFree
       FilterToOpenAir = locationSearchResult.OnlyOpenAir
-      FilterToPrivate  = locationSearchResult.OnlyPrivate
+      FilterToPrivate = locationSearchResult.OnlyPrivate
       DistanceFilter = filterToDistance
 
-      TagFilterFilter =  locationSearchResult.SelectedTags
-      CategoryFilter  = locationSearchResult.SelectedCategories
-      NeighborhoodFilter  = locationSearchResult.SelectedNeighborhoods
+      TagFilterFilter = locationSearchResult.SelectedTags
+      CategoryFilter = locationSearchResult.SelectedCategories
+      NeighborhoodFilter = locationSearchResult.SelectedNeighborhoods
       CurrentPage = 1
-      ItemsPerPage = 50}
+      ItemsPerPage = 50 }
 
 let mapBrowsePageFilterChangeToLocationSearchRequsst (change: BrowsePageFilterChange) =
     match change with
-    | FilterChanged b ->mapBrowseFilterModelToLocationSearchRequest b
-    | LoadNextPage  b ->mapBrowseFilterModelToLocationSearchRequest b
-    | LoadPreviousPage  b ->mapBrowseFilterModelToLocationSearchRequest b
+    | FilterChanged b -> mapBrowseFilterModelToLocationSearchRequest b
+    | LoadNextPage b -> mapBrowseFilterModelToLocationSearchRequest b
+    | LoadPreviousPage b -> mapBrowseFilterModelToLocationSearchRequest b
 
 let mapSearchResultToReceievedBrowsePageResult (searchResult: LocationSearchResult) : Msg =
-    { Filter = mapLocationSearchRequestToBrowseFilterModel (searchResult.SearchRequest)
-      TotalResults = searchResult.TotalResults
-      TotalPages = searchResult.TotalPages
-      CurrentPage = searchResult.CurrentPage
-      Results = searchResult.Results
-
-    }
-    |> ReceievedBrowsePageResult
+    { Filter =
+          mapLocationSearchRequestToBrowseFilterModel
+              (searchResult.SearchRequest)
+              searchResult.TotalPages
+              searchResult.TotalResults
+      Results = searchResult.Results }
+    |> ReceivedBrowsePageResult
 
 let urlUpdate (result: Option<ClientRoute>) (model: Model) =
     let modelWithNewRoute = (modelWithNewPageModel model)
@@ -130,7 +136,10 @@ let urlUpdate (result: Option<ClientRoute>) (model: Model) =
     | Some (Find (query, filter, page)) -> (modelWithNewRoute ((query, filter, page) |> FindPageModel), [])
     | Some (Browse id) ->
         (model,
-         (Cmd.OfAsync.perform todosApi.searchLocations emptySearchRequest mapSearchResultToReceievedBrowsePageResult))
+         (Cmd.OfAsync.perform
+             locationInformationApi.searchLocations
+             emptySearchRequest
+             mapSearchResultToReceievedBrowsePageResult))
     | Some AddLocation -> (modelWithNewRoute AddLocationPageModel, [])
     | Some YourLocations -> (modelWithNewRoute YourLocationsPageModel, [])
     | Some Login -> (modelWithNewRoute LoginPageModel, [])
@@ -138,7 +147,8 @@ let urlUpdate (result: Option<ClientRoute>) (model: Model) =
     | Some Logout -> (modelWithNewRoute LogoutPageModel, [])
     | Some YourAccount -> (modelWithNewRoute YourAccountPageModel, [])
     | Some (EditLocation id) -> (modelWithNewRoute (id |> EditLocationPageModel), [])
-    | Some (ViewLocation id) -> (model, (Cmd.OfAsync.perform todosApi.getLocation id RecievedLocationDetail))
+    | Some (ViewLocation id) ->
+        (model, (Cmd.OfAsync.perform locationInformationApi.getLocation id ReceivedLocationDetail))
     | Some About -> (modelWithNewRoute AboutPageModel, [])
     | None -> (modelWithNewRoute NotFound, []) // no matching route - 404
 
@@ -157,14 +167,14 @@ let init (initialRoute: Option<ClientRoute>) : Model * Cmd<Msg> =
 
 let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
     match msg with
-    | RecievedLocationDetail d -> modelWithNewPageModel model (d |> ViewLocationPageModel), Cmd.none
-    | ReceievedBrowsePageResult d ->
-        Console.WriteLine(d)
-        modelWithNewPageModel model (d |> BrowsePageModel), Cmd.none
-    | BrowsePageFilterChanged d -> 
-        Console.WriteLine(d)
+    | ReceivedLocationDetail d -> modelWithNewPageModel model (d |> ViewLocationPageModel), Cmd.none
+    | ReceivedBrowsePageResult d -> modelWithNewPageModel model (d |> BrowsePageModel), Cmd.none
+    | BrowsePageFilterChanged d ->
         (model,
-         (Cmd.OfAsync.perform todosApi.searchLocations (mapBrowsePageFilterChangeToLocationSearchRequsst d) mapSearchResultToReceievedBrowsePageResult))
+         (Cmd.OfAsync.perform
+             locationInformationApi.searchLocations
+             (mapBrowsePageFilterChangeToLocationSearchRequsst d)
+             mapSearchResultToReceievedBrowsePageResult))
     | _ -> model, Cmd.none
 
 
