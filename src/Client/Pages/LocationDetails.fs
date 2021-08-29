@@ -9,7 +9,6 @@ open Shared
 open Shared.DataTransferFormats
 
 
-
 let locationDetailView (model: LocationDetailModel) (dispatch: Msg -> unit) =
 
     let addressSection (address: AddressDetailModel option) =
