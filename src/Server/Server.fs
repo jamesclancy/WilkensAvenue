@@ -105,7 +105,7 @@ let exampleLocation =
 
 
 let generateABunchOfItems =
-    [ 1 .. 50 ]
+    [ 1 .. 16 ]
     |> Seq.map
         (fun x ->
             { Id = "1"
@@ -142,9 +142,9 @@ let locationInformationApi =
               async {
                   return
                       { SearchRequest = req
-                        TotalResults = 50
-                        TotalPages = 1
-                        CurrentPage = 1
+                        TotalResults = 90
+                        TotalPages = Convert.ToInt32(Math.Ceiling(90m / 16m))
+                        CurrentPage = req.CurrentPage
                         Results = Some(List.ofSeq generateABunchOfItems) }
               } }
 

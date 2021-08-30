@@ -76,8 +76,8 @@ let mapBrowseFilterModelToLocationSearchRequest (locationSearchResult: BrowseFil
       TagFilterFilter = locationSearchResult.SelectedTags
       CategoryFilter = locationSearchResult.SelectedCategories
       NeighborhoodFilter = locationSearchResult.SelectedNeighborhoods
-      CurrentPage = 1
-      ItemsPerPage = 50 }
+      CurrentPage = locationSearchResult.CurrentPage
+      ItemsPerPage = 16 }
 
 let mapBrowsePageFilterChangeToLocationSearchRequsst (change: BrowsePageFilterChange) =
     match change with

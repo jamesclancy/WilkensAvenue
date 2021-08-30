@@ -6,7 +6,9 @@ open Feliz.Bulma
 open SharedComponents
 open System
 open Shared.DataTransferFormats
+open Shared.StaticData
 open Fulma
+
 
 let addressSection (address: AddressDetailModel option) =
 
@@ -42,7 +44,7 @@ let renderNeighborhoodInformation (locationSummaryViewModel: LocationSummaryView
 
 let locationSummaryCardTitlePart (locationSummaryViewModel: LocationSummaryViewModel) (dispatch: Msg -> unit) =
     Bulma.mediaContent [ Bulma.title.p [ Bulma.title.is4
-                                         prop.children [ Html.a [ prop.href "#/viewlocation/12312"
+                                         prop.children [ Html.a [ prop.href (sprintf "#/viewlocation/%s" locationSummaryViewModel.Id)
                                                                   prop.className "has-text-black"
                                                                   prop.text locationSummaryViewModel.Name ] ] ]
                          Bulma.subtitle.p [ Bulma.title.is6
@@ -69,9 +71,15 @@ let locationSummaryCard (locationSummaryViewModel: LocationSummaryViewModel) (di
                                                                         locationSummaryViewModel
                                                                         dispatch ] ] ] ]
 
-let buildTagInput placeHolder posibleValues currentValue onChanged =
+let buildTagInput placeHolder possibleValues currentValue onChanged =
+
+    let valueWithoutOption =
+        match currentValue with
+        | Some s -> s
+        | None _ -> []
+
     TagsInput.input [ tagsInput.placeholder placeHolder
-                      tagsInput.defaultValue currentValue
+                      tagsInput.defaultValue valueWithoutOption
                       tagsInput.onTagsChanged onChanged
                       tagsInput.allowOnlyAutoCompleteValues true
                       tagsInput.caseSensitive false
@@ -82,14 +90,13 @@ let buildTagInput placeHolder posibleValues currentValue onChanged =
                       tagsInput.autoCompleteSource (
                           (fun text ->
                               async {
-                                  do! Async.Sleep 10
+                                  let lowerCaseText = text.ToString().ToLower()
 
                                   return
-                                      posibleValues
-                                      |> List.filter (fun x -> x.Contains(text))
+                                      possibleValues
+                                      |> List.filter (fun x -> x.ToString().ToLower().Contains(lowerCaseText))
                               })
                       ) ]
-
 
 let buildDistanceFiler (browseMenuModel: BrowseFilterModel) (dispatch: BrowsePageFilterChange -> unit) =
     [ Bulma.panelHeading [ prop.text "Distance" ]
@@ -153,33 +160,80 @@ let leftMenu (browseMenuModel: BrowseFilterModel) (dispatch: BrowsePageFilterCha
                                                                                           prop.children [ Html.i [ prop.className
                                                                                                                        "fas fa-search" ] ] ] ] ] ]
                   Bulma.panelBlock.div [ Bulma.field.div [ Checkradio.checkbox [ prop.id "onlyFree"
-                                                                                 color.isDanger ]
+                                                                                 color.isDanger
+                                                                                 prop.isChecked browseMenuModel.OnlyFree
+                                                                                 prop.onChange
+                                                                                     (fun x ->
+                                                                                         dispatch (
+                                                                                             { browseMenuModel with
+                                                                                                   OnlyFree = x }
+                                                                                             |> FilterChanged
+                                                                                         )) ]
                                                            Html.label [ prop.htmlFor "onlyFree"
                                                                         prop.text "Only Free" ] ] ]
                   Bulma.panelBlock.div [ Bulma.field.div [ Checkradio.checkbox [ prop.id "onlyOpenAir"
-                                                                                 color.isDanger ]
+                                                                                 color.isDanger
+                                                                                 prop.isChecked
+                                                                                     browseMenuModel.OnlyOpenAir
+                                                                                 prop.onChange
+                                                                                     (fun x ->
+                                                                                         dispatch (
+                                                                                             { browseMenuModel with
+                                                                                                   OnlyOpenAir = x }
+                                                                                             |> FilterChanged
+                                                                                         )) ]
                                                            Html.label [ prop.htmlFor "onlyOpenAir"
                                                                         prop.text "Only Open Air" ] ] ]
                   Bulma.panelBlock.div [ Bulma.field.div [ Checkradio.checkbox [ prop.id "onlyPrivate"
-                                                                                 color.isDanger ]
+                                                                                 color.isDanger
+                                                                                 prop.isChecked
+                                                                                     browseMenuModel.OnlyPrivate
+                                                                                 prop.onChange
+                                                                                     (fun x ->
+                                                                                         dispatch (
+                                                                                             { browseMenuModel with
+                                                                                                   OnlyPrivate = x }
+                                                                                             |> FilterChanged
+                                                                                         )) ]
                                                            Html.label [ prop.htmlFor "onlyPrivate"
                                                                         prop.text "Only Private" ] ] ]
                   yield! (buildDistanceFiler browseMenuModel dispatch)
                   Bulma.panelHeading [ prop.text "Tags" ]
                   Bulma.panelBlock.div [ Bulma.control.div [ prop.children [ buildTagInput
                                                                                  "Filter to Tags"
-                                                                                 [ "Railroad"; "Steel"; "Canning" ]
-                                                                                 []
+                                                                                 Shared.StaticData.possibleTags
+                                                                                 browseMenuModel.SelectedTags
                                                                                  (fun x ->
-                                                                                     Fable.Core.JS.console.log (x)) ] ] ]
+                                                                                     dispatch (
+                                                                                         { browseMenuModel with
+                                                                                               SelectedTags = x |> Some }
+                                                                                         |> FilterChanged
+                                                                                     )) ] ] ]
 
                   Bulma.panelHeading [ prop.text "Categories" ]
                   Bulma.panelBlock.div [ Bulma.control.div [ prop.children [ buildTagInput
                                                                                  "Filter to Categories"
-                                                                                 [ "Railroad"; "Steel"; "Canning" ]
-                                                                                 []
+                                                                                 Shared.StaticData.possibleCategories
+                                                                                 browseMenuModel.SelectedCategories
                                                                                  (fun x ->
-                                                                                     Fable.Core.JS.console.log (x)) ] ] ] ]
+                                                                                     dispatch (
+                                                                                         { browseMenuModel with
+                                                                                               SelectedCategories =
+                                                                                                   x |> Some }
+                                                                                         |> FilterChanged
+                                                                                     )) ] ] ]
+                  Bulma.panelHeading [ prop.text "Neighborhoods" ]
+                  Bulma.panelBlock.div [ Bulma.control.div [ prop.children [ buildTagInput
+                                                                                 "Filter to Categories"
+                                                                                 Shared.StaticData.possibleNeighborhoods
+                                                                                 browseMenuModel.SelectedNeighborhoods
+                                                                                 (fun x ->
+                                                                                     dispatch (
+                                                                                         { browseMenuModel with
+                                                                                               SelectedNeighborhoods =
+                                                                                                   x |> Some }
+                                                                                         |> FilterChanged
+                                                                                     )) ] ] ] ]
 
 
 
@@ -188,19 +242,74 @@ let renderLocationSummaryCards items (dispatch: Msg -> unit) =
     |> List.map (fun x -> (locationSummaryCard x dispatch))
     |> Seq.ofList
 
-let displaySearchResults (locations: LocationSummaryViewModel list option) (dispatch: Msg -> unit) =
+let displaySearchResults (browseViewModel: BrowsePageModel) (dispatch: Msg -> unit) =
+    let menuDispatch menuBrowse =
+        menuBrowse |> BrowsePageFilterChanged |> dispatch
+
+    let locations = browseViewModel.Results
+
     match locations with
     | None
     | Some [] -> [ Html.div [ prop.children [ Html.b [ prop.text "nothing found" ] ] ] ]
     | Some items ->
-        [ Html.div [ prop.children [ Html.b [ prop.text "150 exciting locations found..." ] ] ]
+        [ Html.div [ prop.children [ Html.b [ prop.text (
+                                                  sprintf
+                                                      "A total of %i results found. You are on page %i of %i"
+                                                      browseViewModel.Filter.TotalResults
+                                                      browseViewModel.Filter.CurrentPage
+                                                      browseViewModel.Filter.TotalPages
+                                              ) ] ] ]
           Bulma.container [ container.isFluid
                             prop.children [ Bulma.section [ prop.children [ Bulma.columns [ columns.isMultiline
                                                                                             prop.children (
                                                                                                 renderLocationSummaryCards
                                                                                                     items
                                                                                                     dispatch
-                                                                                            ) ] ] ] ] ] ]
+                                                                                            ) ] ] ]
+                                            Bulma.section [ prop.children [ Bulma.pagination [ pagination.isCentered
+                                                                                               pagination.isLarge
+                                                                                               prop.children [ Bulma.paginationPrevious.button [ prop.text
+                                                                                                                                                     "Previous"
+                                                                                                                                                 prop.disabled (
+                                                                                                                                                     browseViewModel.Filter.CurrentPage
+                                                                                                                                                     <= 1
+                                                                                                                                                 )
+                                                                                                                                                 prop.onClick
+                                                                                                                                                     (fun _ ->
+                                                                                                                                                         menuDispatch (
+                                                                                                                                                             { browseViewModel.Filter with
+                                                                                                                                                                   CurrentPage =
+                                                                                                                                                                       browseViewModel.Filter.CurrentPage
+                                                                                                                                                                       - 1 }
+                                                                                                                                                             |> LoadPreviousPage
+                                                                                                                                                         )) ]
+                                                                                                               Bulma.paginationNext.button [ prop.text
+                                                                                                                                                 "Next"
+                                                                                                                                             prop.disabled (
+                                                                                                                                                 browseViewModel.Filter.TotalPages
+                                                                                                                                                 <= browseViewModel.Filter.CurrentPage
+                                                                                                                                             )
+                                                                                                                                             prop.onClick
+                                                                                                                                                 (fun _ ->
+                                                                                                                                                     menuDispatch (
+                                                                                                                                                         { browseViewModel.Filter with
+                                                                                                                                                               CurrentPage =
+                                                                                                                                                                   browseViewModel.Filter.CurrentPage
+                                                                                                                                                                   + 1 }
+                                                                                                                                                         |> LoadNextPage
+                                                                                                                                                     )) ]
+
+                                                                                                                ]
+
+                                                                                                ]
+
+                                                                             ]
+
+                                                             ]
+
+                                             ]
+
+                             ] ]
 
 let browseView (browseViewModel: BrowsePageModel) (dispatch: Msg -> unit) =
 
@@ -224,5 +333,5 @@ let browseView (browseViewModel: BrowsePageModel) (dispatch: Msg -> unit) =
                                                                                                                                                      column.is10FullHd
                                                                                                                                                      prop.children [ yield!
                                                                                                                                                                          displaySearchResults
-                                                                                                                                                                             browseViewModel.Results
+                                                                                                                                                                             browseViewModel
                                                                                                                                                                              dispatch ] ] ] ] ] ] ] ] ] ]

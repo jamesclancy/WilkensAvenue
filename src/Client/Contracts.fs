@@ -79,4 +79,3 @@ type ClientRoute =
     | EditLocation of string
     | ViewLocation of string
     | About
-
