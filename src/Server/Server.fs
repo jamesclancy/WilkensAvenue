@@ -143,7 +143,7 @@ let locationInformationApi =
                   return
                       { SearchRequest = req
                         TotalResults = 90
-                        TotalPages = Convert.ToInt32(Math.Ceiling(90m/ 16m))
+                        TotalPages = Convert.ToInt32(Math.Ceiling(90m / 16m))
                         CurrentPage = req.CurrentPage
                         Results = Some(List.ofSeq generateABunchOfItems) }
               } }
