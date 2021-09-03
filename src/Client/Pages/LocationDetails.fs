@@ -7,7 +7,7 @@ open SharedComponents
 open System
 open Shared
 open Shared.DataTransferFormats
-
+open Feliz.Quill
 
 let locationDetailView (model: LocationDetailModel) (dispatch: Msg -> unit) =
 
@@ -46,6 +46,20 @@ let locationDetailView (model: LocationDetailModel) (dispatch: Msg -> unit) =
                                                     yield Html.span "Upload your own photos!" ] ]
             }
 
+    let rec editablePageSection sectionTitle previousValue =
+        match previousValue with
+          | None -> editablePageSection sectionTitle (Some "")
+          | Some s -> 
+                Quill.editor [
+                    editor.toolbar [
+                        [ Header (ToolbarHeader.Dropdown [1..4]) ]
+                        [ ForegroundColor; BackgroundColor ]
+                        [ Bold; Italic; Underline; Strikethrough; Blockquote; Code ]
+                        [ OrderedList; UnorderedList; DecreaseIndent; IncreaseIndent; CodeBlock ]
+                    ]
+                    editor.defaultValue s
+                ]
+
     let pageContent (model: LocationDetailModel) =
         [ Bulma.title [ title.is1
                         prop.className "mb-5"
@@ -53,8 +67,8 @@ let locationDetailView (model: LocationDetailModel) (dispatch: Msg -> unit) =
           Bulma.title [ title.is2
                         prop.className "has-text-grey "
                         prop.text model.SubTitle ]
-          yield! sectionOrYieldNothing "" "Summary" model.Summary
-          yield! sectionOrYieldNothing "" "Description" model.Description
+          editablePageSection "Summary" model.Summary
+          editablePageSection "Description" model.Description
           yield! addressSection model.Address
           yield! displayImages model.Images
           yield!
