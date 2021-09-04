@@ -75,17 +75,21 @@ let init (initialRoute: Option<ClientRoute>) : Model * Cmd<Msg> =
               CurrentUser = None
               PageModel = LoadingScreenPageModel }
 
+
+
 let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
-    match msg with
-    | ReceivedLocationDetail d -> modelWithNewPageModel model (d |> ViewLocationPageModel), Cmd.none
-    | ReceivedBrowsePageResult d -> modelWithNewPageModel model (d |> BrowsePageModel), Cmd.none
-    | BrowsePageFilterChanged d ->
+    match msg, model.PageModel with
+    | ReceivedLocationDetail d, _ -> modelWithNewPageModel model ( (d, Pages.LocationDetails.defaultEditState d) |> ViewLocationPageModel), Cmd.none
+    | ReceivedBrowsePageResult d, _  -> modelWithNewPageModel model (d |> BrowsePageModel), Cmd.none
+    | BrowsePageFilterChanged d, _  ->
         (model,
          (Cmd.OfAsync.perform
              locationInformationApi.searchLocations
              (mapBrowsePageFilterChangeToLocationSearchRequsst d)
              mapSearchResultToReceievedBrowsePageResult))
-    | _ -> model, Cmd.none
+    | LocationDetailUpdated d, ViewLocationPageModel (currPage, currentEditState)  ->
+       { model with PageModel = Pages.LocationDetails.updateLocationDetailsModel d currPage currentEditState |> ViewLocationPageModel }, Cmd.none
+    | _, _  -> model, Cmd.none
 
 
 open Pages.Home
@@ -98,7 +102,7 @@ let view (model: Model) (dispatch: Msg -> unit) =
     match model.PageModel with
     | HomePageModel -> homeView dispatch
     | LoadingScreenPageModel -> SharedComponents.loadingScreen
-    | ViewLocationPageModel d -> locationDetailView d dispatch
+    | ViewLocationPageModel (d, e) -> locationDetailView d e dispatch
     | BrowsePageModel bpm -> browseView bpm dispatch
     | NotFound -> str "404"
     | _ -> str "???"
