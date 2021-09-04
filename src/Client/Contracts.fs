@@ -33,6 +33,12 @@ type BrowsePageModel =
 
       Results: LocationSummaryViewModel list option }
 
+type UpdateLocationDetailState =
+    { EditingSummary: bool
+      NewSummaryContent: string
+      EditingDescription: bool
+      NewDescriptionContent: string }
+
 type PageModel =
     | HomePageModel
     | FindPageModel of string * string * int
@@ -44,7 +50,7 @@ type PageModel =
     | LogoutPageModel
     | YourAccountPageModel
     | EditLocationPageModel of string
-    | ViewLocationPageModel of LocationDetailModel
+    | ViewLocationPageModel of LocationDetailModel * UpdateLocationDetailState
     | AboutPageModel
     | NotFound
     | Unauthorized
@@ -60,10 +66,21 @@ type BrowsePageFilterChange =
     | LoadNextPage of BrowseFilterModel
     | LoadPreviousPage of BrowseFilterModel
 
+type LocationDetailUpdate =
+    | SummaryStartEdit
+    | SummaryTextChanged of string
+    | SummaryTextSaved
+    | SummaryTextChangeCanceled
+    | DescriptionStartEdit
+    | DescriptionTextChanged of string
+    | DescriptionTextSaved
+    | DescriptionTextChangeCanceled
+
 type Msg =
     | ReceivedLocationDetail of LocationDetailModel
     | BrowsePageFilterChanged of BrowsePageFilterChange
     | ReceivedBrowsePageResult of BrowsePageModel
+    | LocationDetailUpdated of LocationDetailUpdate
 
 
 type ClientRoute =

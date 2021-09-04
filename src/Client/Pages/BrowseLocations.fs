@@ -44,7 +44,11 @@ let renderNeighborhoodInformation (locationSummaryViewModel: LocationSummaryView
 
 let locationSummaryCardTitlePart (locationSummaryViewModel: LocationSummaryViewModel) (dispatch: Msg -> unit) =
     Bulma.mediaContent [ Bulma.title.p [ Bulma.title.is4
-                                         prop.children [ Html.a [ prop.href (sprintf "#/viewlocation/%s" locationSummaryViewModel.Id)
+                                         prop.children [ Html.a [ prop.href (
+                                                                      sprintf
+                                                                          "#/viewlocation/%s"
+                                                                          locationSummaryViewModel.Id
+                                                                  )
                                                                   prop.className "has-text-black"
                                                                   prop.text locationSummaryViewModel.Name ] ] ]
                          Bulma.subtitle.p [ Bulma.title.is6
