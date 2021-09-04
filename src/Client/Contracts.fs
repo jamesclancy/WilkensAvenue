@@ -34,12 +34,10 @@ type BrowsePageModel =
       Results: LocationSummaryViewModel list option }
 
 type UpdateLocationDetailState =
-    {
-        EditingSummary: bool
-        NewSummaryContent: string
-        EditingDescription: bool
-        NewDesciptionContent: string
-    }
+    { EditingSummary: bool
+      NewSummaryContent: string
+      EditingDescription: bool
+      NewDescriptionContent: string }
 
 type PageModel =
     | HomePageModel

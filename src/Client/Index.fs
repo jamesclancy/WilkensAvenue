@@ -79,17 +79,26 @@ let init (initialRoute: Option<ClientRoute>) : Model * Cmd<Msg> =
 
 let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
     match msg, model.PageModel with
-    | ReceivedLocationDetail d, _ -> modelWithNewPageModel model ( (d, Pages.LocationDetails.defaultEditState d) |> ViewLocationPageModel), Cmd.none
-    | ReceivedBrowsePageResult d, _  -> modelWithNewPageModel model (d |> BrowsePageModel), Cmd.none
-    | BrowsePageFilterChanged d, _  ->
+    | ReceivedLocationDetail d, _ ->
+        modelWithNewPageModel
+            model
+            ((d, Pages.LocationDetails.defaultEditState d)
+             |> ViewLocationPageModel),
+        Cmd.none
+    | ReceivedBrowsePageResult d, _ -> modelWithNewPageModel model (d |> BrowsePageModel), Cmd.none
+    | BrowsePageFilterChanged d, _ ->
         (model,
          (Cmd.OfAsync.perform
              locationInformationApi.searchLocations
              (mapBrowsePageFilterChangeToLocationSearchRequsst d)
              mapSearchResultToReceievedBrowsePageResult))
-    | LocationDetailUpdated d, ViewLocationPageModel (currPage, currentEditState)  ->
-       { model with PageModel = Pages.LocationDetails.updateLocationDetailsModel d currPage currentEditState |> ViewLocationPageModel }, Cmd.none
-    | _, _  -> model, Cmd.none
+    | LocationDetailUpdated d, ViewLocationPageModel (currPage, currentEditState) ->
+        { model with
+              PageModel =
+                  Pages.LocationDetails.updateLocationDetailsModel d currPage currentEditState
+                  |> ViewLocationPageModel },
+        Cmd.none
+    | _, _ -> model, Cmd.none
 
 
 open Pages.Home
