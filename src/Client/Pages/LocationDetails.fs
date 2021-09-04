@@ -46,19 +46,35 @@ let locationDetailView (model: LocationDetailModel) (dispatch: Msg -> unit) =
                                                     yield Html.span "Upload your own photos!" ] ]
             }
 
-    let rec editablePageSection sectionTitle previousValue =
-        match previousValue with
-          | None -> editablePageSection sectionTitle (Some "")
-          | Some s -> 
-                Quill.editor [
-                    editor.toolbar [
-                        [ Header (ToolbarHeader.Dropdown [1..4]) ]
-                        [ ForegroundColor; BackgroundColor ]
-                        [ Bold; Italic; Underline; Strikethrough; Blockquote; Code ]
-                        [ OrderedList; UnorderedList; DecreaseIndent; IncreaseIndent; CodeBlock ]
-                    ]
-                    editor.defaultValue s
-                ]
+    let rec editablePageSection (sectionTitle: string) previousValue boolEditingEnabled =
+      match previousValue with
+      | None -> editablePageSection sectionTitle (Some "") boolEditingEnabled
+      | Some s ->
+        if not boolEditingEnabled then 
+            seq {
+                yield
+                    Bulma.section [ prop.children [ Bulma.title [ prop.children [ Html.span [prop.text sectionTitle]; Html.i [ prop.className "fas fa-edit is-pulled-right" ]  ] ]
+                                                    Html.p [ prop.text s ] ] ]
+            }
+        else
+                 seq {
+                            yield
+                                Bulma.section [ prop.children [ Bulma.title [ prop.text sectionTitle  ]
+                                                                Quill.editor [
+                                                                    editor.toolbar [
+                                                                        [ Header (ToolbarHeader.Dropdown [1..4]) ]
+                                                                        [ ForegroundColor; BackgroundColor ]
+                                                                        [ Bold; Italic; Underline; Strikethrough; Blockquote; Code ]
+                                                                        [ OrderedList; UnorderedList; DecreaseIndent; IncreaseIndent; CodeBlock ]
+                                                                    ]
+                                                                    editor.defaultValue s
+                                                                    editor.onTextChanged (fun x -> Console.WriteLine(x))
+                                                                ]
+                                                                Bulma.button.button [
+                                                                    button.isLarge
+                                                                    prop.text "Save"
+                                                                ] ] ]
+                        }
 
     let pageContent (model: LocationDetailModel) =
         [ Bulma.title [ title.is1
@@ -67,8 +83,8 @@ let locationDetailView (model: LocationDetailModel) (dispatch: Msg -> unit) =
           Bulma.title [ title.is2
                         prop.className "has-text-grey "
                         prop.text model.SubTitle ]
-          editablePageSection "Summary" model.Summary
-          editablePageSection "Description" model.Description
+          yield! editablePageSection "Summary" model.Summary true
+          yield! editablePageSection "Description" model.Description false
           yield! addressSection model.Address
           yield! displayImages model.Images
           yield!
