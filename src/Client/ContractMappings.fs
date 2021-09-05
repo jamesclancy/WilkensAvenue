@@ -79,7 +79,7 @@ let mapBrowseFilterModelToLocationSearchRequest (locationSearchResult: BrowseFil
       CurrentPage = locationSearchResult.CurrentPage
       ItemsPerPage = 16 }
 
-let mapBrowsePageFilterChangeToLocationSearchRequsst (change: BrowsePageFilterChange) =
+let mapBrowsePageFilterChangeToLocationSearchRequest (change: BrowsePageFilterChange) =
     match change with
     | FilterChanged b -> mapBrowseFilterModelToLocationSearchRequest b
     | LoadNextPage b -> mapBrowseFilterModelToLocationSearchRequest b
@@ -93,3 +93,20 @@ let mapSearchResultToReceievedBrowsePageResult (searchResult: LocationSearchResu
               searchResult.TotalResults
       Results = searchResult.Results }
     |> ReceivedBrowsePageResult
+
+let mapLocationDetailToEditRequest (id: string) currentEditState =
+    { Id = id
+      Summary = currentEditState.NewSummaryContent
+      Description = currentEditState.NewDescriptionContent }
+
+let mapUpdateResultsToUpdateDetailResponseReceived
+    (d: LocationDetailUpdate)
+    (currPage: LocationDetailModel)
+    (editState: UpdateLocationDetailState)
+    response
+    =
+
+    (currPage,
+     { editState with
+           ErrorMessage = response.ErrorMessage })
+    |> LocationDetailUpdateServerResponseReceived

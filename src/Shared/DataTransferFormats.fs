@@ -115,3 +115,10 @@ type LocationSearchResult =
       CurrentPage: int
 
       Results: LocationSummaryViewModel list option }
+
+type LocationDetailUpdateRequest =
+    { Id: string
+      Summary: string
+      Description: string }
+
+type LocationDetailUpdateResult = { ErrorMessage: string option }
