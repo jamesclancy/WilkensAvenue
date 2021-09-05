@@ -11,4 +11,5 @@ module Route =
 
 type ILocationInformationApi =
     { getLocation: string -> Async<LocationDetailModel>
-      searchLocations: LocationSearchRequest -> Async<LocationSearchResult> }
+      searchLocations: LocationSearchRequest -> Async<LocationSearchResult>
+      updateLocationDetails: LocationDetailUpdateRequest -> Async<LocationDetailUpdateResult> }

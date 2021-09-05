@@ -146,7 +146,9 @@ let locationInformationApi =
                         TotalPages = Convert.ToInt32(Math.Ceiling(90m / 16m))
                         CurrentPage = req.CurrentPage
                         Results = Some(List.ofSeq generateABunchOfItems) }
-              } }
+              }
+      updateLocationDetails = fun req -> async { return { ErrorMessage = None } }
+    }
 
 let webApp : HttpFunc -> HttpContext -> HttpFuncResult =
     Remoting.createApi ()

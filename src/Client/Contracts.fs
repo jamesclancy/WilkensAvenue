@@ -37,7 +37,8 @@ type UpdateLocationDetailState =
     { EditingSummary: bool
       NewSummaryContent: string
       EditingDescription: bool
-      NewDescriptionContent: string }
+      NewDescriptionContent: string
+      ErrorMessage: string option }
 
 type PageModel =
     | HomePageModel
@@ -76,11 +77,15 @@ type LocationDetailUpdate =
     | DescriptionTextSaved
     | DescriptionTextChangeCanceled
 
+
+
+
 type Msg =
     | ReceivedLocationDetail of LocationDetailModel
     | BrowsePageFilterChanged of BrowsePageFilterChange
     | ReceivedBrowsePageResult of BrowsePageModel
     | LocationDetailUpdated of LocationDetailUpdate
+    | LocationDetailUpdateServerResponseReceived of LocationDetailModel * UpdateLocationDetailState
 
 
 type ClientRoute =
