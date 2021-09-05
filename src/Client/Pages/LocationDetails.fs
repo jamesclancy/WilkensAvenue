@@ -38,7 +38,6 @@ let updateLocationDetailsModel
     match d with
     | SummaryStartEdit -> currPage, { editState with EditingSummary = true }, Cmd.none
     | SummaryTextChanged s ->
-        Console.WriteLine(s)
         currPage, { editState with NewSummaryContent = s }, Cmd.none
     | SummaryTextSaved ->
         { currPage with
