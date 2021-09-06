@@ -50,7 +50,7 @@ let exampleLocation =
                 State = Some "MD"
                 Zipcode = Some "21223"
                 Longitude = -76.655M
-                Latitude =  39.275277777777774M  }
+                Latitude = 39.275277777777774M }
 
 
       Images =
@@ -132,7 +132,7 @@ let generateABunchOfItems =
                         State = Some "MD"
                         Zipcode = Some "21223"
                         Longitude = -76.655M
-                        Latitude =  39.275277777777774M } })
+                        Latitude = 39.275277777777774M } })
 
 
 let locationInformationApi =
@@ -147,8 +147,7 @@ let locationInformationApi =
                         CurrentPage = req.CurrentPage
                         Results = Some(List.ofSeq generateABunchOfItems) }
               }
-      updateLocationDetails = fun req -> async { return { ErrorMessage = None } }
-    }
+      updateLocationDetails = fun req -> async { return { ErrorMessage = None } } }
 
 let webApp : HttpFunc -> HttpContext -> HttpFuncResult =
     Remoting.createApi ()

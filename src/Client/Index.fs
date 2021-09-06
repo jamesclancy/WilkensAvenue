@@ -93,11 +93,16 @@ let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
              (mapBrowsePageFilterChangeToLocationSearchRequest d)
              mapSearchResultToReceievedBrowsePageResult))
     | LocationDetailUpdated d, ViewLocationPageModel (currPage, currentEditState) ->
-        let (pm,ed, cmd) =  Pages.LocationDetails.updateLocationDetailsModel d currPage currentEditState locationInformationApi.updateLocationDetails
+        let (pm, ed, cmd) =
+            Pages.LocationDetails.updateLocationDetailsModel
+                d
+                currPage
+                currentEditState
+                locationInformationApi.updateLocationDetails
+
         { model with
-              PageModel =
-                 (pm, ed)
-                  |> ViewLocationPageModel }, cmd
+              PageModel = (pm, ed) |> ViewLocationPageModel },
+        cmd
 
     | _, _ -> model, Cmd.none
 
