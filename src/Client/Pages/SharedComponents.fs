@@ -24,23 +24,33 @@ let navBar (dispatch: Msg -> unit) =
                                                                                                            prop.children [ Html.h1 [ prop.text
                                                                                                                                          "Wilkens Avenue"
                                                                                                                                      prop.className
-                                                                                                                                         "title is-1 text navBarHeader" ] ] ] ]
-                                                              Bulma.navbarMenu [ Bulma.navbarStart.div [ Bulma.navbarItem.a [ prop.text
-                                                                                                                                  "Home"
-                                                                                                                              prop.href
-                                                                                                                                  "#/" ]
-                                                                                                         Bulma.navbarItem.a [ prop.text
-                                                                                                                                  "Find"
-                                                                                                                              prop.href
-                                                                                                                                  "#/browse/12312" ]
-                                                                                                         Bulma.navbarItem.a [ prop.text
-                                                                                                                                  "Browse"
-                                                                                                                              prop.href
-                                                                                                                                  "#/browse/12312" ] ]
-                                                                                 Bulma.navbarEnd.div [ Bulma.navbarItem.div [ Bulma.buttons [ Bulma.button.a [ Html.strong
-                                                                                                                                                                   "Login" ]
-                                                                                                                                              Bulma.button.a [ prop.text
-                                                                                                                                                                   "Register" ] ] ] ] ] ] ] ] ]
+                                                                                                                                         "title navBarHeader" ] ] ]
+
+                                                                                      Bulma.navbarBurger [ prop.custom (
+                                                                                                               "data-target",
+                                                                                                               "nav-menu"
+                                                                                                           )
+                                                                                                           prop.children [ Html.span [  ]
+                                                                                                                           Html.span [  ]
+                                                                                                                           Html.span [  ] ] ] ]
+
+                                                              Bulma.navbarMenu [ prop.id "nav-menu"
+                                                                                 prop.children [ Bulma.navbarStart.div [ Bulma.navbarItem.a [ prop.text
+                                                                                                                                                  "Home"
+                                                                                                                                              prop.href
+                                                                                                                                                  "#/" ]
+                                                                                                                         Bulma.navbarItem.a [ prop.text
+                                                                                                                                                  "Find"
+                                                                                                                                              prop.href
+                                                                                                                                                  "#/browse/12312" ]
+                                                                                                                         Bulma.navbarItem.a [ prop.text
+                                                                                                                                                  "Browse"
+                                                                                                                                              prop.href
+                                                                                                                                                  "#/browse/12312" ] ]
+                                                                                                 Bulma.navbarEnd.div [ Bulma.navbarItem.div [ Bulma.buttons [ Bulma.button.a [ Html.strong
+                                                                                                                                                                                   "Login" ]
+                                                                                                                                                              Bulma.button.a [ prop.text
+                                                                                                                                                                                   "Register" ] ] ] ] ] ] ] ] ] ]
 
 
 

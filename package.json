@@ -29,11 +29,13 @@
         "bulma": "^0.9.3",
         "bulma-checkradio": "^1.1.1",
         "bulma-pageloader": "^0.3.0",
+        "bulma-popover": "^1.1.0",
         "fable-compiler": "^2.13.0",
         "fable-compiler-js": "^3.0.0",
+        "pigeon-maps": "^0.19.7",
+        "quill-blot-formatter": "^1.0.5",
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
-        "react-quill": "^2.0.0-beta.4",
-        "quill-blot-formatter": "^1.0.5"
+        "react-quill": "^2.0.0-beta.4"
     }
 }

@@ -3,6 +3,8 @@ framework: net5.0
 storage: none
 
 nuget Fable.Remoting.Giraffe
+nuget Feliz.Bulma.Popover
+nuget Feliz.PigeonMaps
 nuget Feliz.Quill
 nuget Saturn
 nuget Expecto

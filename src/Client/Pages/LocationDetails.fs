@@ -3,6 +3,7 @@ module Pages.LocationDetails
 open Contracts
 open Feliz
 open Feliz.Bulma
+open Feliz.PigeonMaps
 open SharedComponents
 open System
 open Shared
@@ -37,36 +38,41 @@ let updateLocationDetailsModel
 
     match d with
     | SummaryStartEdit -> currPage, { editState with EditingSummary = true }, Cmd.none
-    | SummaryTextChanged s ->
-        currPage, { editState with NewSummaryContent = s }, Cmd.none
+    | SummaryTextChanged s -> currPage, { editState with NewSummaryContent = s }, Cmd.none
     | SummaryTextSaved ->
         { currPage with
               Summary = Some editState.NewSummaryContent },
         { editState with
-              EditingSummary = false }, buildCmdForSave
+              EditingSummary = false },
+        buildCmdForSave
     | SummaryTextChangeCanceled ->
         currPage,
         { editState with
               EditingSummary = false
-              NewSummaryContent = stringEmptyOrValue currPage.Summary }, Cmd.none
+              NewSummaryContent = stringEmptyOrValue currPage.Summary },
+        Cmd.none
     | DescriptionStartEdit ->
         currPage,
         { editState with
-              EditingDescription = true }, Cmd.none
+              EditingDescription = true },
+        Cmd.none
     | DescriptionTextChanged s ->
         currPage,
         { editState with
-              NewDescriptionContent = s }, Cmd.none
+              NewDescriptionContent = s },
+        Cmd.none
     | DescriptionTextSaved ->
         { currPage with
               Description = Some editState.NewDescriptionContent },
         { editState with
-              EditingDescription = false }, buildCmdForSave
+              EditingDescription = false },
+        buildCmdForSave
     | DescriptionTextChangeCanceled ->
         currPage,
         { editState with
               EditingDescription = false
-              NewDescriptionContent = stringEmptyOrValue currPage.Description }, Cmd.none
+              NewDescriptionContent = stringEmptyOrValue currPage.Description },
+        Cmd.none
 
 
 
@@ -79,21 +85,77 @@ let locationDetailView (model: LocationDetailModel) (editState: UpdateLocationDe
             | None -> Seq.empty
             | Some s -> seq { yield Html.span s }
 
+        let stringOrEmpty (optStr: string option) =
+            match optStr with
+            | None -> String.Empty
+            | Some s -> s
+
+        let formattedAddress a =
+            [ Html.p [ prop.children [ yield! tryReturnString a.Address1
+                                       yield! tryReturnString a.Address2
+                                       yield! tryReturnString a.Address3 ] ]
+              Html.p [ prop.text (
+                           sprintf "%s, %s, %s" (stringOrEmpty a.City) (stringOrEmpty a.State) (stringOrEmpty a.Zipcode)
+                       ) ]
+              Html.p [ prop.text (sprintf "LongLat: (%.2f, %.2f)" a.Longitude a.Latitude) ] ]
+
         match address with
         | None -> Seq.empty
         | Some a ->
             seq {
                 yield
                     Bulma.section [ Bulma.title "Location"
-                                    Html.p [ prop.children [ yield! tryReturnString a.Address1
-                                                             yield! tryReturnString a.Address2
-                                                             yield! tryReturnString a.Address3
-                                                             yield! tryReturnString a.City
-                                                             yield! tryReturnString a.State
-                                                             yield! tryReturnString a.Zipcode
-
-                                                             yield Html.span (sprintf "Latitude: %f" a.Latitude)
-                                                             yield Html.span (sprintf "Longitude: %f" a.Longitude) ] ] ]
+                                    Html.p [ prop.children [ yield
+                                                                 PigeonMaps.map [ map.center (
+                                                                                      (float a.Latitude) + (float 0.003),
+                                                                                      (float a.Longitude)
+                                                                                      + (float 0.005)
+                                                                                  )
+                                                                                  map.zoom 15
+                                                                                  map.height 350
+                                                                                  map.markers [ PigeonMaps.marker [ marker.anchor (
+                                                                                                                        float
+                                                                                                                            a.Latitude,
+                                                                                                                        float
+                                                                                                                            a.Longitude
+                                                                                                                    )
+                                                                                                                    marker.offsetLeft
+                                                                                                                        10
+                                                                                                                    marker.offsetTop
+                                                                                                                        50
+                                                                                                                    marker.render
+                                                                                                                        (fun marker ->
+                                                                                                                            [ Popover.popover [ Html.a [ prop.children [ Html.i [ if marker.hovered then
+                                                                                                                                                                                      prop.style [ style.color.red
+                                                                                                                                                                                                   style.cursor.pointer ]
+                                                                                                                                                                                  prop.className [ "fa"
+                                                                                                                                                                                                   "fa-map-marker"
+                                                                                                                                                                                                   "fa-2x" ] ] ]
+                                                                                                                                                         popover.trigger
+                                                                                                                                                         prop.href (
+                                                                                                                                                             sprintf
+                                                                                                                                                                 "https://mapquest.com/latlng/%f,%f"
+                                                                                                                                                                 a.Latitude
+                                                                                                                                                                 a.Longitude
+                                                                                                                                                         )
+                                                                                                                                                         prop.target
+                                                                                                                                                             "_blank" ]
+                                                                                                                                                Popover.content [ Bulma.card [ Bulma.cardHeader [ Bulma.cardHeaderTitle.p
+                                                                                                                                                                                                      model.Name ]
+                                                                                                                                                                               Bulma.cardContent [ Bulma.content (
+                                                                                                                                                                                                       formattedAddress
+                                                                                                                                                                                                           a
+                                                                                                                                                                                                   ) ] ] ] ] ]) ] ] ] ] ]
+                                    yield! formattedAddress a
+                                    Html.p [ Html.a [ prop.text "Find Directions"
+                                                      popover.trigger
+                                                      prop.href (
+                                                          sprintf
+                                                              "https://mapquest.com/latlng/%f,%f"
+                                                              a.Latitude
+                                                              a.Longitude
+                                                      )
+                                                      prop.target "_blank" ] ] ]
             }
 
     let displayImages images =
@@ -182,14 +244,13 @@ let locationDetailView (model: LocationDetailModel) (editState: UpdateLocationDe
                                                                                                                                                                   "Cancel" ] ] ] ] ] ] ] ]
                 }
 
-    let errorMessage (msg : string option) =
+    let errorMessage (msg: string option) =
         match msg with
         | None -> Seq.empty
-        | Some s -> seq {
-            Bulma.notification [
-                Bulma.color.isDanger
-                prop.text s
-                ]
+        | Some s ->
+            seq {
+                Bulma.notification [ Bulma.color.isDanger
+                                     prop.text s ]
             }
 
     let pageContent
@@ -231,9 +292,6 @@ let locationDetailView (model: LocationDetailModel) (editState: UpdateLocationDe
                   model.DescriptionCitation
           Html.div [ prop.className "buttons"
                      prop.children [ Html.a [ prop.className "button is-primary"
-                                              prop.href "https://github.com/jamesclancy/WilkensAvenue"
-                                              prop.text "Find Directions" ]
-                                     Html.a [ prop.className "button is-primary"
                                               prop.href "https://github.com/jamesclancy/WilkensAvenue"
                                               prop.text "Upload Images" ] ] ] ]
 
