@@ -80,6 +80,8 @@ type LocationDetailUpdate =
 
 type Msg =
     | ToggleBurger
+    | UserInformationRequired
+    | UserInformationFetched of string option
     | ReceivedLocationDetail of LocationDetailModel
     | BrowsePageFilterChanged of BrowsePageFilterChange
     | ReceivedBrowsePageResult of BrowsePageModel

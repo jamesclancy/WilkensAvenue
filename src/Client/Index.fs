@@ -16,6 +16,16 @@ let locationInformationApi =
     |> Remoting.withRouteBuilder Route.builder
     |> Remoting.buildProxy<ILocationInformationApi>
 
+let secureAccountApi =
+    Remoting.createApi ()
+    |> Remoting.withRouteBuilder Route.builder
+    |> Remoting.buildProxy<ISecureAccountApi>
+
+let publicAccountApi =
+    Remoting.createApi ()
+    |> Remoting.withRouteBuilder Route.builder
+    |> Remoting.buildProxy<IPublicAccountApi>
+
 let clientRouter : UrlParser.Parser<(ClientRoute -> ClientRoute), ClientRoute> =
     oneOf [
         map About (s "about")
@@ -38,8 +48,8 @@ let modelWithNewPageModel model pm =
           PageModel = pm }
 
 
-let urlUpdate (result: Option<ClientRoute>) (model: Model) =
-    let modelWithNewRoute = (modelWithNewPageModel model)
+let urlUpdate (result: Option<ClientRoute>) (model: Model) : Model * Cmd<Msg> =
+    let modelWithNewRoute = (modelWithNewPageModel model) 
 
     match result with
     | Some Home -> (modelWithNewRoute HomePageModel, [])
@@ -68,14 +78,19 @@ let init (initialRoute: Option<ClientRoute>) : Model * Cmd<Msg> =
           CurrentUser = None
           PageModel = HomePageModel
           MenuBurgerExpanded = false },
-        Cmd.none
+        Cmd.ofMsg UserInformationRequired
     else
-        urlUpdate
-            initialRoute
-            { CurrentRoute = None
-              CurrentUser = None
-              PageModel = LoadingScreenPageModel
-              MenuBurgerExpanded = false }
+        let (model, cmds) = urlUpdate
+                                initialRoute
+                                { CurrentRoute = None
+                                  CurrentUser = None
+                                  PageModel = LoadingScreenPageModel
+                                  MenuBurgerExpanded = false }
+        let defaultCmd = Cmd.ofMsg UserInformationRequired
+        let cmdBatch = seq { defaultCmd
+                             cmds
+                           }
+        model, Cmd.batch cmdBatch
 
 
 
@@ -85,6 +100,10 @@ let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
         { model with
               MenuBurgerExpanded = not model.MenuBurgerExpanded },
         Cmd.none
+    | UserInformationRequired, _ ->
+        model,
+        Cmd.OfAsync.perform publicAccountApi.getCurrentUser () (fun x -> x.CurrentUserName |> UserInformationFetched)
+    | UserInformationFetched u, _ -> { model with CurrentUser = u }, Cmd.none
     | ReceivedLocationDetail d, _ ->
         modelWithNewPageModel
             model

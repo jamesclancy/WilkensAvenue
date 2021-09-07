@@ -21,6 +21,12 @@ let navBar (model: Model) (dispatch: Msg -> unit) =
                 ""
         }
 
+    let navBarLoginContent =
+        match model.CurrentUser with
+        | None ->
+            [ Bulma.navbarItem.div [ Bulma.buttons [ Bulma.button.a [ prop.text "Login or Register"; prop.href "/login" ] ] ] ]
+        | Some s ->  [ Bulma.navbarItem.div [ Bulma.buttons [ Bulma.button.a [ prop.text "Logout"; prop.href "/logout" ] ] ] ]
+
     Html.div [ prop.children [ Bulma.navbar [ color.isLight
                                               navbar.isTransparent
                                               navbar.hasShadow
@@ -62,10 +68,7 @@ let navBar (model: Model) (dispatch: Msg -> unit) =
                                                                                                                                                   "Browse"
                                                                                                                                               prop.href
                                                                                                                                                   "#/browse/12312" ] ]
-                                                                                                 Bulma.navbarEnd.div [ Bulma.navbarItem.div [ Bulma.buttons [ Bulma.button.a [ Html.strong
-                                                                                                                                                                                   "Login" ]
-                                                                                                                                                              Bulma.button.a [ prop.text
-                                                                                                                                                                                   "Register" ] ] ] ] ] ] ] ] ] ]
+                                                                                                 Bulma.navbarEnd.div navBarLoginContent ] ] ] ] ] ]
 
 
 

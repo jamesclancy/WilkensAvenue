@@ -10,6 +10,9 @@ open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Configuration
 open Saturn
 open System
+open Shared.DataTransferFormats
+open FSharp.Control.Tasks
+
 
 let authChallenge : HttpFunc -> HttpContext -> HttpFuncResult =
     requiresAuthentication (
@@ -17,7 +20,7 @@ let authChallenge : HttpFunc -> HttpContext -> HttpFuncResult =
     )
 
 let addAuth (app: IApplicationBuilder) =
-    app.UseCookiePolicy().UseAuthentication()
+    app.UseCookiePolicy( new CookiePolicyOptions(MinimumSameSitePolicy=SameSiteMode.Lax,Secure=CookieSecurePolicy.None)).UseAuthentication()
 
 type Saturn.Application.ApplicationBuilder with
     [<CustomOperation("use_open_id_auth_with_config_from_service_collection")>]
@@ -34,10 +37,14 @@ type Saturn.Application.ApplicationBuilder with
                     (fun authConfig ->
                         authConfig.DefaultScheme <- CookieAuthenticationDefaults.AuthenticationScheme
                         authConfig.DefaultChallengeScheme <- OpenIdConnectDefaults.AuthenticationScheme
-                        authConfig.DefaultSignInScheme <- CookieAuthenticationDefaults.AuthenticationScheme)
+                        authConfig.DefaultSignInScheme <- CookieAuthenticationDefaults.AuthenticationScheme
+                        )
 
             if not state.CookiesAlreadyAdded then
-                authBuilder.AddCookie() |> ignore
+                authBuilder.AddCookie((fun opt ->
+                                                  opt.Cookie.SameSite <- SameSiteMode.Lax
+                                                  opt.Cookie.SecurePolicy <- CookieSecurePolicy.None
+                                                  opt.Cookie.IsEssential <- true )) |> ignore
 
             authBuilder.AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, (config s))
             |> ignore
@@ -81,3 +88,32 @@ let openIdConfig (services: IServiceCollection) =
             opt.ResponseType <- responseType)
 
     new Action<Microsoft.AspNetCore.Authentication.OpenIdConnect.OpenIdConnectOptions>(fn)
+
+let signOut (next : HttpFunc) (ctx : HttpContext) =
+  task {
+    do! ctx.SignOutAsync()
+    return! next ctx
+  }
+
+let userInformationFromContext (ctx: HttpContext) =
+    let nameClaim =
+        Seq.filter (fun (x: System.Security.Claims.Claim) -> x.Type = "playerName") ctx.User.Claims
+        |> Seq.toList
+
+    let idClaim =
+        Seq.filter (fun (x: System.Security.Claims.Claim) -> x.Type = "playerId") ctx.User.Claims
+        |> Seq.toList
+
+    match nameClaim, idClaim with
+    | [ x ], [ y ] ->
+        { CurrentlyLoggedIn = true
+          CurrentUserId = Some y.Value
+          CurrentUserName = Some x.Value }
+    | [], [ y ] ->
+        { CurrentlyLoggedIn = true
+          CurrentUserId = Some y.Value
+          CurrentUserName = Some y.Value }
+    | _, _ ->
+        { CurrentlyLoggedIn = false
+          CurrentUserId = None
+          CurrentUserName = None }

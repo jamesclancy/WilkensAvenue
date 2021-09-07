@@ -13,3 +13,9 @@ type ILocationInformationApi =
     { getLocation: string -> Async<LocationDetailModel>
       searchLocations: LocationSearchRequest -> Async<LocationSearchResult>
       updateLocationDetails: LocationDetailUpdateRequest -> Async<LocationDetailUpdateResult> }
+
+type IPublicAccountApi =
+    { getCurrentUser: unit -> Async<CurrentUserLoginStatusResponse> }
+
+type ISecureAccountApi =
+    { login: unit -> Async<CurrentUserLoginStatusResponse> }
