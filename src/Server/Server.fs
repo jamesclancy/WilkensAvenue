@@ -28,16 +28,11 @@ let locationInformationApi =
               }
       updateLocationDetails = fun req -> async { return { ErrorMessage = None } } }
 
-
-let generalPurposeApi ctx =
-        {
-            getCurrentUser = fun unit -> async { return userDisplayNameFromContext ctx }
-        }
+let accountPublishApi  ctx =
+    { getCurrentUser = fun unit -> async { return userInformationFromContext ctx } }
 
 let accountInformationApi ctx =
-        {
-            login = fun unit -> async { return userDisplayNameFromContext ctx }
-        }
+    { login = fun unit -> async { return userInformationFromContext ctx } }
 
 let buildLocationApi next ctx =
     task {
@@ -46,36 +41,39 @@ let buildLocationApi next ctx =
             |> Remoting.withRouteBuilder Route.builderWithoutApiPrefix
             |> Remoting.fromValue locationInformationApi
             |> Remoting.buildHttpHandler
+
         return! handler next ctx
     }
 
 let buildSecureAccountApi next ctx =
-        task {
-            let handler =
-                Remoting.createApi ()
-                |> Remoting.withRouteBuilder Route.builderWithoutApiPrefix
-                |> Remoting.fromValue accountInformationApi
-                |> Remoting.buildHttpHandler
-            return! handler next ctx
-        }
-        
+    task {
+        let handler =
+            Remoting.createApi ()
+            |> Remoting.withRouteBuilder Route.builderWithoutApiPrefix
+            |> Remoting.fromValue (accountInformationApi ctx)
+            |> Remoting.buildHttpHandler
+
+        return! handler next ctx
+    }
+
 let buildPublicAccountApi next ctx =
-                task {
-                    let handler =
-                        Remoting.createApi ()
-                        |> Remoting.withRouteBuilder Route.builderWithoutApiPrefix
-                        |> Remoting.fromValue generalPurposeApi
-                        |> Remoting.buildHttpHandler
-                    return! handler next ctx
-                }
+    task {
+        let handler =
+            Remoting.createApi ()
+            |> Remoting.withRouteBuilder Route.builderWithoutApiPrefix
+            |> Remoting.fromValue (accountPublishApi ctx)
+            |> Remoting.buildHttpHandler
+
+        return! handler next ctx
+    }
 
 let routes : HttpFunc -> HttpContext -> HttpFuncResult =
     choose [ route "/loggedinhomepage"
              >=> (authChallenge
                   >=> htmlString "You are logged in now.")
-             subRoute "/api" ( buildLocationApi)
-             subRoute "/api" ( buildPublicAccountApi)
-             subRoute "/api" ( authChallenge >=> buildSecureAccountApi)]
+             subRoute "/api" (buildLocationApi)
+             subRoute "/api" (buildPublicAccountApi)
+             subRoute "/api" (authChallenge >=> buildSecureAccountApi) ]
 
 let getPort =
     let envPort =

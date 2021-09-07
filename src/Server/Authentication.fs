@@ -10,6 +10,8 @@ open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Configuration
 open Saturn
 open System
+open Shared.DataTransferFormats
+
 
 let authChallenge : HttpFunc -> HttpContext -> HttpFuncResult =
     requiresAuthentication (
@@ -83,16 +85,25 @@ let openIdConfig (services: IServiceCollection) =
     new Action<Microsoft.AspNetCore.Authentication.OpenIdConnect.OpenIdConnectOptions>(fn)
 
 
-let userInformationFromContext (ctx :HttpContext) =
-    let nameClaim = Seq.filter (fun (x: System.Security.Claims.Claim) -> x.Type = "playerName") ctx.User.Claims |> Seq.toList
-    let idClaim = Seq.filter (fun (x: System.Security.Claims.Claim) -> x.Type = "playerId") ctx.User.Claims |> Seq.toList
+let userInformationFromContext (ctx: HttpContext) =
+    let nameClaim =
+        Seq.filter (fun (x: System.Security.Claims.Claim) -> x.Type = "playerName") ctx.User.Claims
+        |> Seq.toList
+
+    let idClaim =
+        Seq.filter (fun (x: System.Security.Claims.Claim) -> x.Type = "playerId") ctx.User.Claims
+        |> Seq.toList
 
     match nameClaim, idClaim with
-    | [ x ], [ y ] -> Some (x.Value, y.Value)
-    | [] , [y] -> Some (y.Value, y.Value)
-    | _,_ -> None
-
-let userDisplayNameFromContext (ctx : HttpContext) =
-    match userInformationFromContext ctx with
-    | None ->  None
-    | Some (x, y) -> Some x
+    | [ x ], [ y ] ->
+        { CurrentlyLoggedIn = true
+          CurrentUserId = Some y.Value
+          CurrentUserName = Some x.Value }
+    | [], [ y ] ->
+        { CurrentlyLoggedIn = true
+          CurrentUserId = Some y.Value
+          CurrentUserName = Some y.Value }
+    | _, _ ->
+        { CurrentlyLoggedIn = false
+          CurrentUserId = None
+          CurrentUserName = None }

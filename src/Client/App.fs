@@ -16,9 +16,10 @@ open Contracts
 #endif
 
 let userInformationUpdateRequired initial =
-    let sub dispatch=
-        window.setInterval((fun _ ->
-            dispatch (UserInformationRequired)), 1000) |> ignore
+    let sub dispatch =
+        window.setInterval ((fun _ -> dispatch (UserInformationRequired)), 1000)
+        |> ignore
+
     Cmd.ofSub sub
 
 Program.mkProgram Index.init Index.update Index.view

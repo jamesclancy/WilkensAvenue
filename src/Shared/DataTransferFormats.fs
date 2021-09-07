@@ -122,3 +122,8 @@ type LocationDetailUpdateRequest =
       Description: string }
 
 type LocationDetailUpdateResult = { ErrorMessage: string option }
+
+type CurrentUserLoginStatusResponse =
+    { CurrentlyLoggedIn: bool
+      CurrentUserId: string option
+      CurrentUserName: string option }
