@@ -15,6 +15,14 @@ let locationInformationApi =
     Remoting.createApi ()
     |> Remoting.withRouteBuilder Route.builder
     |> Remoting.buildProxy<ILocationInformationApi>
+let secureAccountApi =
+    Remoting.createApi ()
+    |> Remoting.withRouteBuilder Route.builder
+    |> Remoting.buildProxy<ISecureAccountApi>
+let publicAccountApi =
+    Remoting.createApi ()
+    |> Remoting.withRouteBuilder Route.builder
+    |> Remoting.buildProxy<IPublicAccountApi>
 
 let clientRouter : UrlParser.Parser<(ClientRoute -> ClientRoute), ClientRoute> =
     oneOf [
@@ -84,6 +92,12 @@ let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
     | ToggleBurger, _ ->
         { model with
               MenuBurgerExpanded = not model.MenuBurgerExpanded },
+        Cmd.none
+    | UserInformationRequired ,_ ->
+        model, Cmd.OfAsync.perform publicAccountApi.getCurrentUser () UserInformationFetched
+    | UserInformationFetched u, _ ->
+        { model with
+              CurrentUser = u },
         Cmd.none
     | ReceivedLocationDetail d, _ ->
         modelWithNewPageModel
