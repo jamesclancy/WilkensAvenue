@@ -11,6 +11,7 @@ open Microsoft.Extensions.Configuration
 open Saturn
 open System
 open Shared.DataTransferFormats
+open FSharp.Control.Tasks
 
 
 let authChallenge : HttpFunc -> HttpContext -> HttpFuncResult =
@@ -19,7 +20,7 @@ let authChallenge : HttpFunc -> HttpContext -> HttpFuncResult =
     )
 
 let addAuth (app: IApplicationBuilder) =
-    app.UseCookiePolicy().UseAuthentication()
+    app.UseCookiePolicy( new CookiePolicyOptions(MinimumSameSitePolicy=SameSiteMode.Lax,Secure=CookieSecurePolicy.None)).UseAuthentication()
 
 type Saturn.Application.ApplicationBuilder with
     [<CustomOperation("use_open_id_auth_with_config_from_service_collection")>]
@@ -36,10 +37,14 @@ type Saturn.Application.ApplicationBuilder with
                     (fun authConfig ->
                         authConfig.DefaultScheme <- CookieAuthenticationDefaults.AuthenticationScheme
                         authConfig.DefaultChallengeScheme <- OpenIdConnectDefaults.AuthenticationScheme
-                        authConfig.DefaultSignInScheme <- CookieAuthenticationDefaults.AuthenticationScheme)
+                        authConfig.DefaultSignInScheme <- CookieAuthenticationDefaults.AuthenticationScheme
+                        )
 
             if not state.CookiesAlreadyAdded then
-                authBuilder.AddCookie() |> ignore
+                authBuilder.AddCookie((fun opt ->
+                                                  opt.Cookie.SameSite <- SameSiteMode.Lax
+                                                  opt.Cookie.SecurePolicy <- CookieSecurePolicy.None
+                                                  opt.Cookie.IsEssential <- true )) |> ignore
 
             authBuilder.AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, (config s))
             |> ignore
@@ -84,6 +89,11 @@ let openIdConfig (services: IServiceCollection) =
 
     new Action<Microsoft.AspNetCore.Authentication.OpenIdConnect.OpenIdConnectOptions>(fn)
 
+let signOut (next : HttpFunc) (ctx : HttpContext) =
+  task {
+    do! ctx.SignOutAsync()
+    return! next ctx
+  }
 
 let userInformationFromContext (ctx: HttpContext) =
     let nameClaim =

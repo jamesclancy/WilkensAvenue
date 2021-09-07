@@ -24,14 +24,29 @@ var CONFIG = {
         // redirect requests that start with /api/ to the server on port 8085
         '/api/**': {
             target: 'http://localhost:' + (process.env.SERVER_PROXY_PORT || "8085"),
-               changeOrigin: true
-           },
+            changeOrigin: true
+        },
         // redirect websocket requests that start with /socket/ to the server on the port 8085
         '/socket/**': {
             target: 'http://localhost:' + (process.env.SERVER_PROXY_PORT || "8085"),
             ws: true
-           }
-       }
+        },
+        // redirect websocket requests that start with /socket/ to the server on the port 8085
+        '/login**': {
+            target: 'http://localhost:' + (process.env.SERVER_PROXY_PORT || "8085"),
+            changeOrigin: true
+        },
+        // redirect websocket requests that start with /socket/ to the server on the port 8085
+        '/logout**': {
+            target: 'http://localhost:' + (process.env.SERVER_PROXY_PORT || "8085"),
+            changeOrigin: true
+        },
+        // redirect websocket requests that start with /socket/ to the server on the port 8085
+        '/signin-oidc**': {
+            target: 'http://localhost:' + (process.env.SERVER_PROXY_PORT || "8085"),
+            changeOrigin: true
+        }
+    }
 }
 
 // If we're running the webpack-dev-server, assume we're in development mode

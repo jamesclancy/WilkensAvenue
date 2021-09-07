@@ -48,8 +48,8 @@ let modelWithNewPageModel model pm =
           PageModel = pm }
 
 
-let urlUpdate (result: Option<ClientRoute>) (model: Model) =
-    let modelWithNewRoute = (modelWithNewPageModel model)
+let urlUpdate (result: Option<ClientRoute>) (model: Model) : Model * Cmd<Msg> =
+    let modelWithNewRoute = (modelWithNewPageModel model) 
 
     match result with
     | Some Home -> (modelWithNewRoute HomePageModel, [])
@@ -78,14 +78,19 @@ let init (initialRoute: Option<ClientRoute>) : Model * Cmd<Msg> =
           CurrentUser = None
           PageModel = HomePageModel
           MenuBurgerExpanded = false },
-        Cmd.none
+        Cmd.ofMsg UserInformationRequired
     else
-        urlUpdate
-            initialRoute
-            { CurrentRoute = None
-              CurrentUser = None
-              PageModel = LoadingScreenPageModel
-              MenuBurgerExpanded = false }
+        let (model, cmds) = urlUpdate
+                                initialRoute
+                                { CurrentRoute = None
+                                  CurrentUser = None
+                                  PageModel = LoadingScreenPageModel
+                                  MenuBurgerExpanded = false }
+        let defaultCmd = Cmd.ofMsg UserInformationRequired
+        let cmdBatch = seq { defaultCmd
+                             cmds
+                           }
+        model, Cmd.batch cmdBatch
 
 
 

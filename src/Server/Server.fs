@@ -67,10 +67,10 @@ let buildPublicAccountApi next ctx =
         return! handler next ctx
     }
 
+
 let routes : HttpFunc -> HttpContext -> HttpFuncResult =
-    choose [ route "/loggedinhomepage"
-             >=> (authChallenge
-                  >=> htmlString "You are logged in now.")
+    choose [ route "/login"  >=> (authChallenge >=> redirectTo false "/")
+             route "/signout" >=> signOut >=>   htmlString "Logged Out."
              subRoute "/api" (buildLocationApi)
              subRoute "/api" (buildPublicAccountApi)
              subRoute "/api" (authChallenge >=> buildSecureAccountApi) ]

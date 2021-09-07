@@ -17,7 +17,7 @@ open Contracts
 
 let userInformationUpdateRequired initial =
     let sub dispatch =
-        window.setInterval ((fun _ -> dispatch (UserInformationRequired)), 1000)
+        window.setInterval ((fun _ -> dispatch (UserInformationRequired)), 1000*60)
         |> ignore
 
     Cmd.ofSub sub
