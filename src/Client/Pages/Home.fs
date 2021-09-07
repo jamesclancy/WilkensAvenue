@@ -7,7 +7,7 @@ open SharedComponents
 open System
 open Shared.DataTransferFormats
 
-let homeView (dispatch: Msg -> unit) =
+let homeView (model: Model) (dispatch: Msg -> unit) =
     let homeImageRotation =
         Some [ { Id = "1"
                  Name = "From wikipedia"
@@ -73,4 +73,4 @@ let homeView (dispatch: Msg -> unit) =
                                      Html.br []
                                      Html.br [] ] ] ]
 
-    halfPageImagePage homeImageRotation pageContent dispatch
+    halfPageImagePage model homeImageRotation pageContent dispatch

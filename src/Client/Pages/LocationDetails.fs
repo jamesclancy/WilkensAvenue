@@ -76,7 +76,12 @@ let updateLocationDetailsModel
 
 
 
-let locationDetailView (model: LocationDetailModel) (editState: UpdateLocationDetailState) (dispatch: Msg -> unit) =
+let locationDetailView
+    (fullModel: Model)
+    (model: LocationDetailModel)
+    (editState: UpdateLocationDetailState)
+    (dispatch: Msg -> unit)
+    =
 
     let addressSection (address: AddressDetailModel option) =
 
@@ -296,6 +301,7 @@ let locationDetailView (model: LocationDetailModel) (editState: UpdateLocationDe
                                               prop.text "Upload Images" ] ] ] ]
 
     halfPageImagePage
+        fullModel
         model.Images
         (pageContent model editState (fun x -> x |> LocationDetailUpdated |> dispatch))
         dispatch
