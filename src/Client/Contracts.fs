@@ -60,7 +60,8 @@ type PageModel =
 type Model =
     { CurrentRoute: Option<string>
       PageModel: PageModel
-      CurrentUser: Option<string> }
+      CurrentUser: Option<string>
+      MenuBurgerExpanded: bool }
 
 type BrowsePageFilterChange =
     | FilterChanged of BrowseFilterModel
@@ -77,16 +78,13 @@ type LocationDetailUpdate =
     | DescriptionTextSaved
     | DescriptionTextChangeCanceled
 
-
-
-
 type Msg =
+    | ToggleBurger
     | ReceivedLocationDetail of LocationDetailModel
     | BrowsePageFilterChanged of BrowsePageFilterChange
     | ReceivedBrowsePageResult of BrowsePageModel
     | LocationDetailUpdated of LocationDetailUpdate
     | LocationDetailUpdateServerResponseReceived of LocationDetailModel * UpdateLocationDetailState
-
 
 type ClientRoute =
     | Home

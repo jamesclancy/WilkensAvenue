@@ -315,13 +315,13 @@ let displaySearchResults (browseViewModel: BrowsePageModel) (dispatch: Msg -> un
 
                              ] ]
 
-let browseView (browseViewModel: BrowsePageModel) (dispatch: Msg -> unit) =
+let browseView (model: Model) (browseViewModel: BrowsePageModel) (dispatch: Msg -> unit) =
 
     let menuDispatch menuBrowse =
         menuBrowse |> BrowsePageFilterChanged |> dispatch
 
     Bulma.section [ prop.classes [ "pt-0"; "is-relative" ]
-                    prop.children [ (navBar dispatch)
+                    prop.children [ (navBar model dispatch)
                                     Bulma.container [ container.isFluid
                                                       prop.children [ Bulma.section [ prop.children [ Bulma.columns [ columns.isMultiline
                                                                                                                       prop.children [ Bulma.column [ column.is12Mobile

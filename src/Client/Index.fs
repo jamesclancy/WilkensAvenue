@@ -66,19 +66,25 @@ let init (initialRoute: Option<ClientRoute>) : Model * Cmd<Msg> =
     if initialRoute = None then
         { CurrentRoute = None
           CurrentUser = None
-          PageModel = HomePageModel },
+          PageModel = HomePageModel
+          MenuBurgerExpanded = false },
         Cmd.none
     else
         urlUpdate
             initialRoute
             { CurrentRoute = None
               CurrentUser = None
-              PageModel = LoadingScreenPageModel }
+              PageModel = LoadingScreenPageModel
+              MenuBurgerExpanded = false }
 
 
 
 let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
     match msg, model.PageModel with
+    | ToggleBurger, _ ->
+        { model with
+              MenuBurgerExpanded = not model.MenuBurgerExpanded },
+        Cmd.none
     | ReceivedLocationDetail d, _ ->
         modelWithNewPageModel
             model
@@ -115,9 +121,9 @@ open Fable.React
 
 let view (model: Model) (dispatch: Msg -> unit) =
     match model.PageModel with
-    | HomePageModel -> homeView dispatch
+    | HomePageModel -> homeView model dispatch
     | LoadingScreenPageModel -> SharedComponents.loadingScreen
-    | ViewLocationPageModel (d, e) -> locationDetailView d e dispatch
-    | BrowsePageModel bpm -> browseView bpm dispatch
+    | ViewLocationPageModel (d, e) -> locationDetailView model d e dispatch
+    | BrowsePageModel bpm -> browseView model bpm dispatch
     | NotFound -> str "404"
     | _ -> str "???"

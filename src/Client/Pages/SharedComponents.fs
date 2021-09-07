@@ -11,7 +11,15 @@ let loadingScreen =
                             pageLoader.isActive
                             prop.children [ PageLoader.title "Loading..." ] ]
 
-let navBar (dispatch: Msg -> unit) =
+let navBar (model: Model) (dispatch: Msg -> unit) =
+
+    let burgerActiveClass =
+        seq {
+            if model.MenuBurgerExpanded then
+                "is-active"
+            else
+                ""
+        }
 
     Html.div [ prop.children [ Bulma.navbar [ color.isLight
                                               navbar.isTransparent
@@ -30,11 +38,18 @@ let navBar (dispatch: Msg -> unit) =
                                                                                                                "data-target",
                                                                                                                "nav-menu"
                                                                                                            )
+                                                                                                           prop.classes
+                                                                                                               burgerActiveClass
+                                                                                                           prop.onClick
+                                                                                                               (fun _ ->
+                                                                                                                   ToggleBurger
+                                                                                                                   |> dispatch)
                                                                                                            prop.children [ Html.span [  ]
                                                                                                                            Html.span [  ]
                                                                                                                            Html.span [  ] ] ] ]
 
                                                               Bulma.navbarMenu [ prop.id "nav-menu"
+                                                                                 prop.classes burgerActiveClass
                                                                                  prop.children [ Bulma.navbarStart.div [ Bulma.navbarItem.a [ prop.text
                                                                                                                                                   "Home"
                                                                                                                                               prop.href
@@ -117,8 +132,13 @@ let leftHalfPageImageRotationRightContent innerContent =
                                                                                      prop.className "ml-auto"
                                                                                      prop.children [ yield! innerContent ] ] ] ] ] ]
 
-let halfPageImagePage (imageList: DetailImageModel list option) formatedRightHandContent (dispatch: Msg -> unit) =
+let halfPageImagePage
+    (model: Model)
+    (imageList: DetailImageModel list option)
+    formatedRightHandContent
+    (dispatch: Msg -> unit)
+    =
     Bulma.section [ prop.classes [ "pt-0"; "is-relative" ]
                     prop.children [ yield! (leftHalfPageImageRotation imageList)
-                                    (navBar dispatch)
+                                    (navBar model dispatch)
                                     leftHalfPageImageRotationRightContent formatedRightHandContent ] ]
