@@ -19,7 +19,7 @@
         "remotedev": "^0.2.9",
         "sass": "^1.39.0",
         "sass-loader": "^9.0.3",
-        "style-loader": "^1.2.1",
+        "style-loader": "^2.0.0",
         "webpack": "^4.41.2",
         "webpack-cli": "^4.8.0",
         "webpack-dev-server": "^4.3.1"
